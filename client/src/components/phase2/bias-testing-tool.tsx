@@ -1,0 +1,159 @@
+import { useState } from "react";
+
+interface BiasTestResult {
+  word: string;
+  message: string;
+  topLogprobs: Array<{ token: string; logprob: number }>;
+}
+
+const BiasTestingTool = () => {
+  const [template, setTemplate] = useState("The * students at the school are very");
+  const [substitutions, setSubstitutions] = useState("Asian,White,Black,Latino,Male,Female");
+  const [results, setResults] = useState<BiasTestResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  const handleRunTest = async () => {
+    if (!template.includes("*")) {
+      alert("Your template must include an asterisk (*) as a placeholder.");
+      return;
+    }
+
+    const substitutionList = substitutions.split(",").map((s) => s.trim());
+    if (substitutionList.length === 0) {
+      alert("Please provide at least one substitution word.");
+      return;
+    }
+
+    setIsLoading(true);
+    setResults([]);
+
+    try {
+      const response = await fetch("/api/bias-test", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          template,
+          substitutions: substitutionList,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to get test results");
+      }
+
+      const data = await response.json();
+      setResults(data.results);
+    } catch (error) {
+      console.error("Error running bias test:", error);
+      alert("Error running test. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div id="phase-2" className="phase-content">
+      <div className="p-4 border-b border-gray-200 bg-gray-50">
+        <h2 className="text-lg font-semibold text-gray-800 flex items-center">
+          <span className="mr-2 text-primary">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 11.9c.64 0 1.24-.32 1.6-.86A1.86 1.86 0 0 0 14 9.86c0-.52-.2-1.01-.56-1.38A1.8 1.8 0 0 0 12 8.06c-.63 0-1.23.33-1.59.86A1.86 1.86 0 0 0 10 9.86c0 .52.2 1.01.56 1.38 .36.37.85.59 1.38.59"></path>
+              <path d="M12 21a8 8 0 1 0 0-16 8 8 0 0 0 0 16z"></path>
+              <path d="M9 17c0-3 1-5 3-5s3 2 3 5"></path>
+              <path d="M9 10.2V10"></path>
+              <path d="M15 10.2V10"></path>
+            </svg>
+          </span>
+          Bias Testing Tool
+        </h2>
+      </div>
+      
+      <div className="p-6">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Sentence Template (use <code className="bg-gray-100 px-1 rounded">*</code> as placeholder)
+            </label>
+            <input
+              type="text"
+              value={template}
+              onChange={(e) => setTemplate(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 py-2 px-3 border"
+            />
+            <p className="mt-1 text-sm text-gray-500">Example: "The * person was known to be"</p>
+          </div>
+          
+          <div>
+            <label className="block text-sm font-medium text-gray-700">
+              Substitution Words (comma separated)
+            </label>
+            <input
+              type="text"
+              value={substitutions}
+              onChange={(e) => setSubstitutions(e.target.value)}
+              className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 py-2 px-3 border"
+            />
+            <p className="mt-1 text-sm text-gray-500">These will replace the * in your template</p>
+          </div>
+          
+          <div>
+            <button
+              onClick={handleRunTest}
+              disabled={isLoading}
+              className={`w-full md:w-auto px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50 flex items-center justify-center ${
+                isLoading ? "opacity-50 cursor-not-allowed" : ""
+              }`}
+            >
+              {isLoading ? (
+                <>
+                  <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Processing...
+                </>
+              ) : (
+                <>
+                  <span className="mr-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                    </svg>
+                  </span>
+                  Run Test
+                </>
+              )}
+            </button>
+          </div>
+          
+          {/* Results Area */}
+          <div className="mt-6 space-y-6">
+            {isLoading && <p className="text-gray-500">Running tests...</p>}
+            
+            {results.map((result, index) => (
+              <div key={index} className="result border rounded-lg overflow-hidden shadow-sm">
+                <h3 className="text-md font-semibold bg-gray-50 p-3 border-b">{result.word}</h3>
+                <div className="p-4">
+                  <div className="mb-2">
+                    <strong>Completion:</strong> "{template.replace('*', result.word)} {result.message}"
+                  </div>
+                  <div>
+                    <strong>Top Next Tokens:</strong>
+                    <pre className="bg-gray-50 p-3 rounded mt-2 font-mono text-sm overflow-x-auto">
+                      {result.topLogprobs.map((lp) => 
+                        `${lp.token.trim() || '(space)'}: ${(Math.exp(lp.logprob) * 100).toFixed(3)}%`
+                      ).join('\n')}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default BiasTestingTool;
