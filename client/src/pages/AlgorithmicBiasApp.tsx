@@ -221,7 +221,7 @@ const AlgorithmicBiasApp = () => {
                     ? () => setCurrentPhase(2)
                     : () => handleParagraphChange(currentParagraph + 1)
                   : undefined
-                : currentPhase === 2 && messages.length >= 10
+                : currentPhase === 2 && messages.length >= 5
                   ? () => setCurrentPhase(3)
                   : undefined
             }
