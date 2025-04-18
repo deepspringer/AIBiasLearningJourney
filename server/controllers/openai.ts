@@ -14,20 +14,26 @@ interface ChatRequestBody {
   phase: number;
   paragraph?: number;
   chatHistory: Array<{ role: string; content: string }>;
+  userId?: string | null;
 }
 
 interface BiasTestRequestBody {
   template: string;
   substitutions: string[];
+  userId?: string | null;
 }
 
 interface SaveConclusionRequestBody {
   conclusion: string;
+  userId?: string | null;
 }
 
 export async function handleChat(req: Request, res: Response) {
   try {
-    const { systemPrompt, userMessage, phase, paragraph, chatHistory } = req.body as ChatRequestBody;
+    const { systemPrompt, userMessage, phase, paragraph, chatHistory, userId: requestUserId } = req.body as ChatRequestBody;
+    
+    // Use the user ID from the request if provided, otherwise use default
+    const userId = requestUserId ? parseInt(requestUserId, 10) : 1;
     
     let finalSystemPrompt = systemPrompt;
     
@@ -67,7 +73,7 @@ export async function handleChat(req: Request, res: Response) {
 
 export async function handleBiasTest(req: Request, res: Response) {
   try {
-    const { template, substitutions } = req.body as BiasTestRequestBody;
+    const { template, substitutions, userId: requestUserId } = req.body as BiasTestRequestBody;
     
     if (!template.includes("*")) {
       return res.status(400).json({ error: "Template must include an asterisk (*) placeholder" });
@@ -79,9 +85,8 @@ export async function handleBiasTest(req: Request, res: Response) {
     
     const results = [];
     
-    // For this demo, we'll use a default user ID of 1
-    // In a real application, you would get the user ID from the session
-    const userId = 1;
+    // Use the user ID from the request if provided, otherwise use default
+    const userId = requestUserId ? parseInt(requestUserId, 10) : 1;
     
     for (const word of substitutions) {
       const sentence = template.replace("*", word);
@@ -105,7 +110,8 @@ export async function handleBiasTest(req: Request, res: Response) {
       });
       
       const message = response.choices[0].message.content || "";
-      const topLogprobs = response.choices[0].logprobs?.content[0].top_logprobs || [];
+      // Safely access logprobs with nullish coalescing to handle potential null/undefined
+      const topLogprobs = response.choices[0].logprobs?.content?.[0]?.top_logprobs || [];
       
       // Store the result in the database
       await storage.saveBiasTestResult({
@@ -131,15 +137,14 @@ export async function handleBiasTest(req: Request, res: Response) {
 
 export async function handleSaveConclusion(req: Request, res: Response) {
   try {
-    const { conclusion } = req.body as SaveConclusionRequestBody;
+    const { conclusion, userId: requestUserId } = req.body as SaveConclusionRequestBody;
     
     if (!conclusion || conclusion.trim() === "") {
       return res.status(400).json({ error: "No conclusion provided" });
     }
     
-    // For this demo, we'll use a default user ID of 1
-    // In a real application, you would get the user ID from the session
-    const userId = 1;
+    // Use the user ID from the request if provided, otherwise use default
+    const userId = requestUserId ? parseInt(requestUserId, 10) : 1;
     
     const savedConclusion = await storage.saveConclusion({
       userId,

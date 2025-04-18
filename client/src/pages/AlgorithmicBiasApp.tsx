@@ -27,6 +27,23 @@ const AlgorithmicBiasApp = () => {
   ]);
   const [currentParagraph, setCurrentParagraph] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [, setLocation] = useLocation();
+  const { toast } = useToast();
+  
+  // User state
+  const [displayName, setDisplayName] = useState<string | null>(null);
+  const [userId, setUserId] = useState<string | null>(null);
+  
+  useEffect(() => {
+    // Load user information from localStorage
+    const storedDisplayName = localStorage.getItem("displayName");
+    const storedUserId = localStorage.getItem("userId");
+    
+    if (storedDisplayName && storedUserId) {
+      setDisplayName(storedDisplayName);
+      setUserId(storedUserId);
+    }
+  }, []);
 
   useEffect(() => {
     // When phase changes, add a phase transition message
@@ -90,6 +107,7 @@ const AlgorithmicBiasApp = () => {
           phase: currentPhase,
           paragraph: currentPhase === 1 ? currentParagraph : undefined,
           chatHistory: messages.filter((msg) => msg.role !== "system"),
+          userId: userId, // Include user ID with all requests
         }),
       });
 
@@ -138,10 +156,40 @@ const AlgorithmicBiasApp = () => {
             <h1 className="text-2xl font-bold text-primary">
               Algorithmic Bias Learning Platform
             </h1>
-            <PhaseNavigation
-              currentPhase={currentPhase}
-              onPhaseChange={setCurrentPhase}
-            />
+            
+            <div className="flex items-center space-x-6">
+              <PhaseNavigation
+                currentPhase={currentPhase}
+                onPhaseChange={setCurrentPhase}
+              />
+              
+              {/* User info and logout */}
+              <div className="flex items-center space-x-3">
+                {displayName && (
+                  <div className="text-sm font-medium">
+                    Welcome, {displayName}
+                  </div>
+                )}
+                <Button 
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    // Clear user data and redirect to login
+                    localStorage.removeItem("userId");
+                    localStorage.removeItem("displayName");
+                    setUserId(null);
+                    setDisplayName(null);
+                    toast({
+                      title: "Logged out",
+                      description: "You've been logged out successfully",
+                    });
+                    setLocation("/");
+                  }}
+                >
+                  Logout
+                </Button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
