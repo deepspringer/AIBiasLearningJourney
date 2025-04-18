@@ -26,19 +26,20 @@ const AlgorithmicBiasApp = () => {
     },
   ]);
   const [currentParagraph, setCurrentParagraph] = useState(1);
+  const [paragraphMessageCounts, setParagraphMessageCounts] = useState<Record<number, number>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  
+
   // User state
   const [displayName, setDisplayName] = useState<string | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
-  
+
   useEffect(() => {
     // Load user information from localStorage
     const storedDisplayName = localStorage.getItem("displayName");
     const storedUserId = localStorage.getItem("userId");
-    
+
     if (storedDisplayName && storedUserId) {
       setDisplayName(storedDisplayName);
       setUserId(storedUserId);
@@ -120,6 +121,10 @@ const AlgorithmicBiasApp = () => {
         ...prev,
         { role: "assistant", content: data.message },
       ]);
+      setParagraphMessageCounts((prevCounts) => ({
+        ...prevCounts,
+        [currentParagraph]: (prevCounts[currentParagraph] || 0) + 1,
+      }));
     } catch (error) {
       console.error("Error sending message:", error);
       setMessages((prev) => [
@@ -145,6 +150,11 @@ const AlgorithmicBiasApp = () => {
         content: `Let's discuss paragraph ${newParagraph}. What do you think is the main point here? How does it relate to what you already know about algorithmic bias?`,
       },
     ]);
+    setParagraphMessageCounts((prevCounts) => ({
+      ...prevCounts,
+      [newParagraph]: 0, //Reset count for new paragraph
+    }));
+
   };
 
   return (
@@ -156,13 +166,13 @@ const AlgorithmicBiasApp = () => {
             <h1 className="text-2xl font-bold text-primary">
               Algorithmic Bias Learning Platform
             </h1>
-            
+
             <div className="flex items-center space-x-6">
               <PhaseNavigation
                 currentPhase={currentPhase}
                 onPhaseChange={setCurrentPhase}
               />
-              
+
               {/* User info and logout */}
               <div className="flex items-center space-x-3">
                 {displayName && (
@@ -210,6 +220,7 @@ const AlgorithmicBiasApp = () => {
               <TextReader
                 currentParagraph={currentParagraph}
                 onParagraphChange={handleParagraphChange}
+                paragraphMessageCounts={paragraphMessageCounts} // Pass message counts to TextReader
               />
             )}
             {currentPhase === 2 && <BiasTestingTool />}

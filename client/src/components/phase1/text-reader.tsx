@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 interface TextReaderProps {
   currentParagraph: number;
   onParagraphChange: (paragraph: number) => void;
+  messageCount: number;
 }
 
 const TextReader = ({ currentParagraph, onParagraphChange }: TextReaderProps) => {
@@ -57,7 +58,7 @@ const TextReader = ({ currentParagraph, onParagraphChange }: TextReaderProps) =>
           
           <button
             onClick={handleNext}
-            disabled={currentParagraph === totalParagraphs}
+            disabled={currentParagraph === totalParagraphs || messageCount === 0}
             className="px-3 py-1 rounded-md bg-gray-100 text-gray-600 hover:bg-gray-200 flex items-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Next
