@@ -86,7 +86,11 @@ const AlgorithmicBiasApp = () => {
     try {
       // Track phase 2 messages separately
       if (currentPhase === 2) {
-        setPhase2Messages(prev => [...prev, { role: "user", content: message }]);
+        setPhase2Messages(prev => {
+          const newMessages = [...prev, { role: "user", content: message }];
+          console.log("[Debug] Phase 2 messages after user message:", newMessages.length);
+          return newMessages;
+        });
       }
       
       // Determine which prompt to use based on the current phase
@@ -128,7 +132,11 @@ const AlgorithmicBiasApp = () => {
       setMessages((prev) => [...prev, assistantMessage]);
       
       if (currentPhase === 2) {
-        setPhase2Messages(prev => [...prev, assistantMessage]);
+        setPhase2Messages(prev => {
+          const newMessages = [...prev, assistantMessage];
+          console.log("[Debug] Phase 2 messages after assistant response:", newMessages.length);
+          return newMessages;
+        });
       }
       setParagraphMessageCounts((prevCounts) => ({
         ...prevCounts,
@@ -229,7 +237,10 @@ const AlgorithmicBiasApp = () => {
                     ? () => setCurrentPhase(2)
                     : () => handleParagraphChange(currentParagraph + 1)
                   : undefined
-                : currentPhase === 2 && phase2Messages.length >= 5
+                : currentPhase === 2 && (() => {
+                    console.log("[Debug] Checking phase2Messages.length:", phase2Messages.length);
+                    return phase2Messages.length >= 5;
+                  })()
                   ? () => setCurrentPhase(3)
                   : undefined
             }
