@@ -188,6 +188,8 @@ const AlgorithmicBiasApp = () => {
               <PhaseNavigation
                 currentPhase={currentPhase}
                 onPhaseChange={setCurrentPhase}
+                isPhase2Unlocked={currentPhase === 2 || (currentPhase === 1 && currentParagraph === ALGORITHMIC_BIAS_TEXT.length && (paragraphMessageCounts[currentParagraph] || 0) >= 2)}
+                isPhase3Unlocked={currentPhase === 3 || (currentPhase === 2 && phase2Messages.length >= 10)}
               />
 
               {/* User info and logout */}

@@ -5,9 +5,11 @@ type Phase = 1 | 2 | 3;
 interface PhaseNavigationProps {
   currentPhase: Phase;
   onPhaseChange: Dispatch<SetStateAction<Phase>>;
+  isPhase2Unlocked: boolean;
+  isPhase3Unlocked: boolean;
 }
 
-const PhaseNavigation = ({ currentPhase, onPhaseChange }: PhaseNavigationProps) => {
+const PhaseNavigation = ({ currentPhase, onPhaseChange, isPhase2Unlocked, isPhase3Unlocked }: PhaseNavigationProps) => {
   const phases = [
     { id: 1, name: "1: Learn", icon: "menu_book" },
     { id: 2, name: "2: Experiment", icon: "psychology" },
@@ -20,11 +22,17 @@ const PhaseNavigation = ({ currentPhase, onPhaseChange }: PhaseNavigationProps) 
         <button
           key={phase.id}
           onClick={() => onPhaseChange(phase.id as Phase)}
+          disabled={phase.id === 2 ? !isPhase2Unlocked : phase.id === 3 ? !isPhase3Unlocked : false}
           className={`flex flex-col items-center px-3 py-2 text-sm font-medium rounded-md 
             ${
               currentPhase === phase.id
                 ? "bg-primary text-white"
                 : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            }
+            ${
+              (phase.id === 2 && !isPhase2Unlocked) || (phase.id === 3 && !isPhase3Unlocked)
+                ? "opacity-50 cursor-not-allowed"
+                : ""
             }`}
         >
           <span className="mb-1">
