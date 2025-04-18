@@ -7,6 +7,8 @@ interface ChatPanelProps {
   messages: Message[];
   onSendMessage: (message: string) => void;
   isLoading: boolean;
+  onFloatingActionClick?: () => void;
+  isLastParagraph?: boolean;
 }
 
 const ChatPanel = ({ messages, onSendMessage, isLoading }: ChatPanelProps) => {
@@ -126,6 +128,18 @@ const ChatPanel = ({ messages, onSendMessage, isLoading }: ChatPanelProps) => {
         )}
         
         <div ref={messagesEndRef} />
+      </div>
+
+      {/* Floating Action Button */}
+      <div className="sticky bottom-20 flex justify-center p-4">
+        {messages.length >= 4 && onFloatingActionClick && (
+          <button
+            onClick={onFloatingActionClick}
+            className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-600 transition-colors"
+          >
+            {isLastParagraph ? "Move onto Experimenting" : "Next Paragraph"}
+          </button>
+        )}
       </div>
 
       {/* Chat Input */}
