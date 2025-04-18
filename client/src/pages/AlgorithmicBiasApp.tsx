@@ -92,7 +92,7 @@ const AlgorithmicBiasApp = () => {
           return newMessages;
         });
       }
-      
+
       // Determine which prompt to use based on the current phase
       let systemPrompt = "";
 
@@ -130,7 +130,7 @@ const AlgorithmicBiasApp = () => {
       const data = await response.json();
       const assistantMessage = { role: "assistant", content: data.message };
       setMessages((prev) => [...prev, assistantMessage]);
-      
+
       if (currentPhase === 2) {
         setPhase2Messages(prev => {
           const newMessages = [...prev, assistantMessage];
@@ -237,10 +237,7 @@ const AlgorithmicBiasApp = () => {
                     ? () => setCurrentPhase(2)
                     : () => handleParagraphChange(currentParagraph + 1)
                   : undefined
-                : currentPhase === 2 && (() => {
-                    console.log("[Debug] Checking phase2Messages.length:", phase2Messages.length);
-                    return phase2Messages.length >= 5;
-                  })()
+                : currentPhase === 2 && phase2Messages.length >= 10
                   ? () => setCurrentPhase(3)
                   : undefined
             }
