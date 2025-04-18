@@ -58,8 +58,12 @@ export default function LoginPage() {
         description: `You've signed in as ${data.displayName}`,
       });
 
-      // Navigate to the main application
-      setLocation("/app");
+      // Navigate to the main application directly by using window.location
+      // This forces a full page refresh which will properly re-initialize the app with the authenticated state
+      window.location.href = "/";
+      
+      // For safety, also set the router location
+      setLocation("/");
     } catch (error) {
       console.error("Login error:", error);
       toast({

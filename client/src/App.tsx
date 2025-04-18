@@ -11,27 +11,26 @@ import { useLocation } from "wouter";
 
 function Router() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [, setLocation] = useLocation();
+  const [location, setLocation] = useLocation();
   
+  // Force a re-check of authentication when location changes
   useEffect(() => {
     // Check if user is authenticated by looking for userId in localStorage
     const userId = localStorage.getItem("userId");
     setIsAuthenticated(!!userId);
-  }, []);
+    
+    console.log("Auth check:", !!userId, "at path:", location);
+  }, [location]);
 
-  // If on protected route, redirect to login
-  useEffect(() => {
-    // Handle redirections based on auth state
-    const currentPath = window.location.pathname;
-    if (!isAuthenticated && currentPath !== "/") {
-      setLocation("/");
-    }
-  }, [isAuthenticated, setLocation]);
+  // We've simplified the routing, so we no longer need this redirection logic
+  // Keeping the authentication check in the component rendering instead
 
+  // Determine which component to render based on authentication
+  const MainApp = isAuthenticated ? AlgorithmicBiasApp : LoginPage;
+  
   return (
     <Switch>
-      <Route path="/" component={isAuthenticated ? AlgorithmicBiasApp : LoginPage} />
-      <Route path="/app" component={isAuthenticated ? AlgorithmicBiasApp : LoginPage} />
+      <Route path="/" component={MainApp} />
       <Route component={NotFound} />
     </Switch>
   );
