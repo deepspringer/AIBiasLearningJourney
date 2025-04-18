@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import OpenAI from "openai";
 import { ALGORITHMIC_BIAS_TEXT } from "../../client/src/constants/text-content";
+import { storage } from "../storage";
 
 // the newest OpenAI model is "gpt-4o" which was released May 13, 2024. do not change this unless explicitly requested by the user
 const openai = new OpenAI({
@@ -124,10 +125,16 @@ export async function handleSaveConclusion(req: Request, res: Response) {
       return res.status(400).json({ error: "No conclusion provided" });
     }
     
-    // In a real application, you would save this to a database
-    // For now, we'll just return success
+    // For this demo, we'll use a default user ID of 1
+    // In a real application, you would get the user ID from the session
+    const userId = 1;
     
-    res.json({ success: true });
+    const savedConclusion = await storage.saveConclusion({
+      userId,
+      content: conclusion
+    });
+    
+    res.json({ success: true, id: savedConclusion.id });
   } catch (error) {
     console.error("Error in save conclusion endpoint:", error);
     res.status(500).json({ error: "Failed to save conclusion" });
