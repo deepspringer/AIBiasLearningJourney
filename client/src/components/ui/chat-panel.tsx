@@ -12,7 +12,7 @@ interface ChatPanelProps {
   currentPhase: number;
 }
 
-const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph }: ChatPanelProps) => {
+const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph, currentPhase }: ChatPanelProps) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
