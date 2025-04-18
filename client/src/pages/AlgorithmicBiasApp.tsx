@@ -255,7 +255,7 @@ const AlgorithmicBiasApp = () => {
                 paragraphMessageCounts={paragraphMessageCounts} // Pass message counts to TextReader
               />
             )}
-            {currentPhase === 2 && <BiasTestingTool />}
+            {currentPhase === 2 && <BiasTestingTool onSendMessage={handleSendMessage} />}
             {currentPhase === 3 && <ConclusionWriter />}
           </PhaseContent>
         </div>
