@@ -213,12 +213,17 @@ const AlgorithmicBiasApp = () => {
             messages={messages}
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
+            currentPhase={currentPhase}
             onFloatingActionClick={
-              (paragraphMessageCounts[currentParagraph] || 0) >= 2
-                ? currentParagraph === ALGORITHMIC_BIAS_TEXT.length
-                  ? () => setCurrentPhase(2)
-                  : () => handleParagraphChange(currentParagraph + 1)
-                : undefined
+              currentPhase === 1
+                ? (paragraphMessageCounts[currentParagraph] || 0) >= 2
+                  ? currentParagraph === ALGORITHMIC_BIAS_TEXT.length
+                    ? () => setCurrentPhase(2)
+                    : () => handleParagraphChange(currentParagraph + 1)
+                  : undefined
+                : currentPhase === 2 && messages.length >= 10
+                  ? () => setCurrentPhase(3)
+                  : undefined
             }
             isLastParagraph={currentParagraph === ALGORITHMIC_BIAS_TEXT.length}
           />
