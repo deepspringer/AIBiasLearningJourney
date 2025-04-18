@@ -45,6 +45,15 @@ export async function handleChat(req: Request, res: Response) {
       finalSystemPrompt = `You are helping to guide a student through the following text paragraph by paragraph: ${fullText}. ${systemPrompt} This is the paragraph you are discussing: ${currentParagraph}`;
     }
     
+    // Store the user's message in the database
+    await storage.saveMessage({
+      userId,
+      role: "user",
+      content: userMessage,
+      phase,
+      paragraph
+    });
+    
     // Convert chat history to OpenAI format
     const messages = [
       { role: "system" as const, content: finalSystemPrompt },
@@ -62,7 +71,27 @@ export async function handleChat(req: Request, res: Response) {
       max_tokens: 800,
     });
     
-    const message = response.choices[0].message.content;
+    const message = response.choices[0].message.content || "";
+    
+    // Store the assistant's response in the database
+    await storage.saveMessage({
+      userId,
+      role: "assistant",
+      content: message || "",
+      phase,
+      paragraph
+    });
+    
+    // Also store the system prompt if this is the first message in the conversation
+    if (chatHistory.length === 0) {
+      await storage.saveMessage({
+        userId,
+        role: "system",
+        content: finalSystemPrompt,
+        phase,
+        paragraph
+      });
+    }
     
     res.json({ message });
   } catch (error) {

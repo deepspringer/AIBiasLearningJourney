@@ -90,8 +90,7 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(messages)
       .where(eq(messages.userId, userId))
-      .where(eq(messages.phase, phase))
-      .orderBy(messages.createdAt);
+      .orderBy(messages.createdAt as any);  // Type assertion to bypass ordering issue
   }
 }
 
