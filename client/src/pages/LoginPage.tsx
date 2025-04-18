@@ -1,0 +1,105 @@
+import { useState } from "react";
+import { useNavigate } from "wouter";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { apiRequest } from "@lib/queryClient";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { useToast } from "@/hooks/use-toast";
+
+const loginSchema = z.object({
+  displayName: z.string().min(2, {
+    message: "Display name must be at least 2 characters.",
+  }),
+});
+
+type LoginFormValues = z.infer<typeof loginSchema>;
+
+export default function LoginPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const form = useForm<LoginFormValues>({
+    resolver: zodResolver(loginSchema),
+    defaultValues: {
+      displayName: "",
+    },
+  });
+
+  async function onSubmit(data: LoginFormValues) {
+    setIsSubmitting(true);
+
+    try {
+      const response = await apiRequest<{ id: number; username: string }>({
+        url: "/api/auth/login",
+        method: "POST",
+        body: {
+          displayName: data.displayName,
+        },
+      });
+
+      localStorage.setItem("userId", response.id.toString());
+      localStorage.setItem("displayName", data.displayName);
+
+      toast({
+        title: "Welcome!",
+        description: `You've signed in as ${data.displayName}`,
+      });
+
+      // Navigate to the main application
+      navigate("/app");
+    } catch (error) {
+      console.error("Login error:", error);
+      toast({
+        title: "Error",
+        description: "There was a problem signing you in. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-b from-gray-50 to-gray-100 p-4">
+      <Card className="w-full max-w-md">
+        <CardHeader className="space-y-1">
+          <CardTitle className="text-2xl font-bold text-center">Algorithmic Bias Explorer</CardTitle>
+          <CardDescription className="text-center">
+            Enter your name to start exploring algorithmic bias
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+              <FormField
+                control={form.control}
+                name="displayName"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Your Name</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter your name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting ? "Signing in..." : "Start Exploring"}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+        <CardFooter className="flex justify-center text-sm text-gray-500">
+          <p>Your data will be used for educational purposes only</p>
+        </CardFooter>
+      </Card>
+    </div>
+  );
+}
