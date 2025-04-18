@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "wouter";
 import PhaseNavigation from "@/components/ui/phase-navigation";
 import ChatPanel from "@/components/ui/chat-panel";
 import PhaseContent from "@/components/ui/phase-content";
@@ -6,6 +7,8 @@ import TextReader from "@/components/phase1/text-reader";
 import BiasTestingTool from "@/components/phase2/bias-testing-tool";
 import ConclusionWriter from "@/components/phase3/conclusion-writer";
 import { ENGAGEMENT_GUIDANCE } from "@/constants/prompts";
+import { Button } from "@/components/ui/button";
+import { useToast } from "@/hooks/use-toast";
 
 type Phase = 1 | 2 | 3;
 export type Message = {

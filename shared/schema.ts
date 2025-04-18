@@ -5,8 +5,8 @@ import { z } from "zod";
 export const users = pgTable("users", {
   id: serial("id").primaryKey(),
   username: text("username").notNull().unique(),
-  password: text("password"),
-  displayName: text("display_name"),
+  password: text("password"), // Keeping this for flexibility but not requiring it
+  displayName: text("display_name").notNull(), // Making displayName required
 });
 
 export const insertUserSchema = createInsertSchema(users).pick({
