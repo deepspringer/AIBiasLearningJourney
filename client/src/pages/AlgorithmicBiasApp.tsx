@@ -26,6 +26,7 @@ const AlgorithmicBiasApp = () => {
         "Welcome to the Algorithmic Bias Learning Platform! I'm here to guide you through understanding algorithmic bias. Let's start by exploring some key concepts. Ready to begin?",
     },
   ]);
+  const [phase2Messages, setPhase2Messages] = useState<Message[]>([]);
   const [currentParagraph, setCurrentParagraph] = useState(1);
   const [paragraphMessageCounts, setParagraphMessageCounts] = useState<Record<number, number>>({});
   const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +84,11 @@ const AlgorithmicBiasApp = () => {
     setIsLoading(true);
 
     try {
+      // Track phase 2 messages separately
+      if (currentPhase === 2) {
+        setPhase2Messages(prev => [...prev, { role: "user", content: message }]);
+      }
+      
       // Determine which prompt to use based on the current phase
       let systemPrompt = "";
 
@@ -118,10 +124,12 @@ const AlgorithmicBiasApp = () => {
       }
 
       const data = await response.json();
-      setMessages((prev) => [
-        ...prev,
-        { role: "assistant", content: data.message },
-      ]);
+      const assistantMessage = { role: "assistant", content: data.message };
+      setMessages((prev) => [...prev, assistantMessage]);
+      
+      if (currentPhase === 2) {
+        setPhase2Messages(prev => [...prev, assistantMessage]);
+      }
       setParagraphMessageCounts((prevCounts) => ({
         ...prevCounts,
         [currentParagraph]: (prevCounts[currentParagraph] || 0) + 1,
@@ -221,7 +229,7 @@ const AlgorithmicBiasApp = () => {
                     ? () => setCurrentPhase(2)
                     : () => handleParagraphChange(currentParagraph + 1)
                   : undefined
-                : currentPhase === 2 && messages.length >= 5
+                : currentPhase === 2 && phase2Messages.length >= 5
                   ? () => setCurrentPhase(3)
                   : undefined
             }
