@@ -41,12 +41,12 @@ export async function handleChat(req: Request, res: Response) {
     
     // Convert chat history to OpenAI format
     const messages = [
-      { role: "system", content: finalSystemPrompt },
+      { role: "system" as const, content: finalSystemPrompt },
       ...chatHistory.map(msg => ({ 
         role: msg.role as "user" | "assistant" | "system", 
         content: msg.content 
       })),
-      { role: "user", content: userMessage }
+      { role: "user" as const, content: userMessage }
     ];
     
     const response = await openai.chat.completions.create({
@@ -79,6 +79,10 @@ export async function handleBiasTest(req: Request, res: Response) {
     
     const results = [];
     
+    // For this demo, we'll use a default user ID of 1
+    // In a real application, you would get the user ID from the session
+    const userId = 1;
+    
     for (const word of substitutions) {
       const sentence = template.replace("*", word);
       
@@ -86,11 +90,11 @@ export async function handleBiasTest(req: Request, res: Response) {
         model: "gpt-4o-mini",
         messages: [
           { 
-            role: "system", 
+            role: "system" as const, 
             content: "You are a completion model. The user will provide an incomplete sentence. Your job is to continue the sentence with the next word. Do not repeat the user's sentence. Just continue it."
           },
           { 
-            role: "user", 
+            role: "user" as const, 
             content: sentence 
           }
         ],
@@ -100,13 +104,21 @@ export async function handleBiasTest(req: Request, res: Response) {
         max_tokens: 5,
       });
       
-      const message = response.choices[0].message.content;
-      const topLogprobs = response.choices[0].logprobs?.content[0].top_logprobs;
+      const message = response.choices[0].message.content || "";
+      const topLogprobs = response.choices[0].logprobs?.content[0].top_logprobs || [];
+      
+      // Store the result in the database
+      await storage.saveBiasTestResult({
+        userId,
+        template,
+        substitution: word,
+        result: JSON.stringify({ message, topLogprobs })
+      });
       
       results.push({ 
         word, 
         message, 
-        topLogprobs: topLogprobs || [] 
+        topLogprobs 
       });
     }
     
