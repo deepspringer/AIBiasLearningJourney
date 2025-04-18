@@ -1,4 +1,9 @@
-import { users, type User, type InsertUser, conclusions, type Conclusion, type InsertConclusion, biasTestResults, type BiasTestResult, type InsertBiasTestResult } from "@shared/schema";
+import { 
+  users, type User, type InsertUser, 
+  conclusions, type Conclusion, type InsertConclusion, 
+  biasTestResults, type BiasTestResult, type InsertBiasTestResult,
+  messages, type Message, type InsertMessage
+} from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
 
@@ -15,6 +20,10 @@ export interface IStorage {
   // Bias test results operations
   saveBiasTestResult(result: InsertBiasTestResult): Promise<BiasTestResult>;
   getBiasTestResultsByUserId(userId: number): Promise<BiasTestResult[]>;
+  
+  // Message operations
+  saveMessage(message: InsertMessage): Promise<Message>;
+  getMessagesByUserId(userId: number, phase: number): Promise<Message[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -66,6 +75,23 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(biasTestResults)
       .where(eq(biasTestResults.userId, userId));
+  }
+  
+  async saveMessage(message: InsertMessage): Promise<Message> {
+    const [savedMessage] = await db
+      .insert(messages)
+      .values(message)
+      .returning();
+    return savedMessage;
+  }
+  
+  async getMessagesByUserId(userId: number, phase: number): Promise<Message[]> {
+    return db
+      .select()
+      .from(messages)
+      .where(eq(messages.userId, userId))
+      .where(eq(messages.phase, phase))
+      .orderBy(messages.createdAt);
   }
 }
 

@@ -1,4 +1,4 @@
-import { pgTable, text, serial, integer, boolean, timestamp } from "drizzle-orm/pg-core";
+import { pgTable, text, serial, integer, boolean, timestamp, json } from "drizzle-orm/pg-core";
 import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
@@ -50,3 +50,25 @@ export const insertBiasTestResultSchema = createInsertSchema(biasTestResults).pi
 
 export type InsertBiasTestResult = z.infer<typeof insertBiasTestResultSchema>;
 export type BiasTestResult = typeof biasTestResults.$inferSelect;
+
+// Define message types
+export const messages = pgTable("messages", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  role: text("role").notNull(), // 'user', 'assistant', or 'system'
+  content: text("content").notNull(),
+  phase: integer("phase").notNull(), // 1, 2, or 3 - the learning phase
+  paragraph: integer("paragraph"), // For phase 1, which paragraph is being discussed
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertMessageSchema = createInsertSchema(messages).pick({
+  userId: true,
+  role: true,
+  content: true,
+  phase: true,
+  paragraph: true,
+});
+
+export type InsertMessage = z.infer<typeof insertMessageSchema>;
+export type Message = typeof messages.$inferSelect;
