@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { useNavigate } from "wouter";
+import { useLocation } from "wouter";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { apiRequest } from "@lib/queryClient";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
@@ -21,7 +20,7 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const navigate = useNavigate();
+  const [, setLocation] = useLocation();
   const { toast } = useToast();
 
   const form = useForm<LoginFormValues>({
@@ -35,15 +34,23 @@ export default function LoginPage() {
     setIsSubmitting(true);
 
     try {
-      const response = await apiRequest<{ id: number; username: string }>({
-        url: "/api/auth/login",
+      const response = await fetch("/api/auth/login", {
         method: "POST",
-        body: {
-          displayName: data.displayName,
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          displayName: data.displayName,
+        }),
       });
+      
+      if (!response.ok) {
+        throw new Error("Login failed");
+      }
+      
+      const result = await response.json();
 
-      localStorage.setItem("userId", response.id.toString());
+      localStorage.setItem("userId", result.id.toString());
       localStorage.setItem("displayName", data.displayName);
 
       toast({
@@ -52,7 +59,7 @@ export default function LoginPage() {
       });
 
       // Navigate to the main application
-      navigate("/app");
+      setLocation("/app");
     } catch (error) {
       console.error("Login error:", error);
       toast({
