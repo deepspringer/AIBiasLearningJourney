@@ -1,5 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { type Message } from "@/pages/AlgorithmicBiasApp";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface ChatPanelProps {
   messages: Message[];
@@ -74,7 +76,15 @@ const ChatPanel = ({ messages, onSendMessage, isLoading }: ChatPanelProps) => {
                   : "bg-gray-100 text-gray-800"
               } rounded-lg p-3 max-w-[85%]`}
             >
-              <p>{message.content}</p>
+              {message.role === "user" ? (
+                <div className="whitespace-pre-wrap">{message.content}</div>
+              ) : (
+                <div className="prose prose-sm max-w-none dark:prose-invert">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {message.content}
+                  </ReactMarkdown>
+                </div>
+              )}
             </div>
             
             {message.role === "user" && (

@@ -1,4 +1,6 @@
 import { ALGORITHMIC_BIAS_TEXT } from "@/constants/text-content";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface TextReaderProps {
   currentParagraph: number;
@@ -78,7 +80,11 @@ const TextReader = ({ currentParagraph, onParagraphChange }: TextReaderProps) =>
                   : "hidden"
               }`}
             >
-              <p>{paragraph}</p>
+              <div className="prose prose-lg max-w-none">
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                  {paragraph}
+                </ReactMarkdown>
+              </div>
             </div>
           ))}
         </div>
