@@ -11,7 +11,7 @@ interface ChatPanelProps {
   isLastParagraph?: boolean;
 }
 
-const ChatPanel = ({ messages, onSendMessage, isLoading }: ChatPanelProps) => {
+const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph }: ChatPanelProps) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
