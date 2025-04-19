@@ -128,18 +128,23 @@ const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
             />
           </div>
           
-          {hasValidTemplate && substitutionList.length > 0 && (
-            <div className="rounded-md bg-gray-50 p-4">
-              <h3 className="text-sm font-medium text-gray-700 mb-2">Preview:</h3>
-              <div className="space-y-1">
-                {previewSentences.map((sentence, index) => (
+          <div className="rounded-md bg-gray-50 p-4">
+            <h3 className="text-sm font-medium text-gray-700 mb-2">Preview:</h3>
+            <div className="space-y-1">
+              {hasValidTemplate && substitutionList.length > 0 ? (
+                previewSentences.map((sentence, index) => (
                   <div key={index} className="text-gray-600 font-mono text-sm">
                     {sentence}
                   </div>
-                ))}
-              </div>
+                ))
+              ) : (
+                <div className="text-red-500 font-medium text-sm">
+                  {!hasValidTemplate && "Make sure you have an asterisk in your template sentence."}
+                  {hasValidTemplate && substitutionList.length === 0 && "Make sure you include some choices in the Demographic Labels area"}
+                </div>
+              )}
             </div>
-          )}
+          </div>
           
           <div>
             <button
