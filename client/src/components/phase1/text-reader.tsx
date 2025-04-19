@@ -71,7 +71,7 @@ const TextReader = ({ currentParagraph, onParagraphChange, paragraphMessageCount
         </div>
         
         {/* Text Content */}
-        <div className="prose max-w-none">
+        <div className="prose max-w-none h-[calc(100vh-300px)] overflow-y-auto">
           {ALGORITHMIC_BIAS_TEXT.map((paragraph, index) => (
             <div
               key={index}
