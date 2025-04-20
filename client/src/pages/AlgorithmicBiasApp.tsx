@@ -192,9 +192,19 @@ ${ENGAGEMENT_GUIDANCE}`;
       // Check engagement if we've reached the threshold
       if (currentPhase === 1 && newCount >= 2) {
         const allMessages = [...messages, { role: "user", content: message }];
+        // Get only messages for current paragraph by filtering out system messages and assistant messages introducing new paragraphs
+        const paragraphMessages = allMessages.filter(m => {
+          if (m.role === "system") return false;
+          if (m.role === "assistant" && m.content.includes(`Let's discuss paragraph`)) return false;
+          // Count messages after the last paragraph change message
+          const lastParagraphMsg = [...allMessages].reverse().find(msg => 
+            msg.role === "assistant" && msg.content.includes(`Let's discuss paragraph`)
+          );
+          return !lastParagraphMsg || allMessages.indexOf(m) > allMessages.indexOf(lastParagraphMsg);
+        });
         const engagementResult = await checkEngagement(
           ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
-          allMessages.filter(m => m.role !== "system")
+          paragraphMessages
         );
         setParagraphEngagement(prev => ({
           ...prev,
