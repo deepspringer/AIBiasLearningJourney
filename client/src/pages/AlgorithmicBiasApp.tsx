@@ -311,15 +311,22 @@ ${ENGAGEMENT_GUIDANCE}`;
             currentPhase={currentPhase}
             onFloatingActionClick={
               currentPhase === 1
-                ? (paragraphMessageCounts[currentParagraph] || 0) >= 2 && 
-                  await checkEngagement(
-                    ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
-                    messages.filter(m => m.role !== "system")
-                  )
-                  ? currentParagraph === ALGORITHMIC_BIAS_TEXT.length
-                    ? () => setCurrentPhase(2)
-                    : () => handleParagraphChange(currentParagraph + 1)
-                  : undefined
+                ? () => {
+                    if ((paragraphMessageCounts[currentParagraph] || 0) >= 2) {
+                      checkEngagement(
+                        ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
+                        messages.filter(m => m.role !== "system")
+                      ).then(canProgress => {
+                        if (canProgress) {
+                          if (currentParagraph === ALGORITHMIC_BIAS_TEXT.length) {
+                            setCurrentPhase(2);
+                          } else {
+                            handleParagraphChange(currentParagraph + 1);
+                          }
+                        }
+                      });
+                    }
+                  }
                 : currentPhase === 2 && phase2Messages.length >= 10
                   ? () => setCurrentPhase(3)
                   : undefined
