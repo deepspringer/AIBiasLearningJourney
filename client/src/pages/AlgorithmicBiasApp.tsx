@@ -202,6 +202,31 @@ ${ENGAGEMENT_GUIDANCE}`;
     }
   };
 
+  const checkEngagement = async (paragraphText: string, messages: Message[]) => {
+    try {
+      const response = await fetch("/api/check-engagement", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          paragraphText,
+          messages: messages.map(m => m.content).join("\n"),
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error("Failed to check engagement");
+      }
+      
+      const data = await response.json();
+      return data.engaged && data.engagement_score >= 5;
+    } catch (error) {
+      console.error("Error checking engagement:", error);
+      return true; // Fallback to allow progression if check fails
+    }
+  };
+
   const handleParagraphChange = (newParagraph: number) => {
     setCurrentParagraph(newParagraph);
     // Add a message about the new paragraph
@@ -286,7 +311,11 @@ ${ENGAGEMENT_GUIDANCE}`;
             currentPhase={currentPhase}
             onFloatingActionClick={
               currentPhase === 1
-                ? (paragraphMessageCounts[currentParagraph] || 0) >= 2
+                ? (paragraphMessageCounts[currentParagraph] || 0) >= 2 && 
+                  await checkEngagement(
+                    ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
+                    messages.filter(m => m.role !== "system")
+                  )
                   ? currentParagraph === ALGORITHMIC_BIAS_TEXT.length
                     ? () => setCurrentPhase(2)
                     : () => handleParagraphChange(currentParagraph + 1)
