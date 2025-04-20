@@ -22,8 +22,7 @@ const AlgorithmicBiasApp = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content:
-      `Hi. I'm here to teach you about bias in Artificial Intelligence. We'll do three things:  
+      content: `Hi. I'm here to teach you about bias in Artificial Intelligence. We'll do three things:  
 1. LOOK: You'll read and discuss some ideas  
 2. THINK: You'll experiment with a tool to see how AI responds differently when it's talking about different kinds of people  
 3. DO: You'll write a conclusion, explaining what you found and why it matters.  
@@ -36,7 +35,9 @@ To start, read this first paragraph and tell me what you think.`,
   const [paragraphMessageCounts, setParagraphMessageCounts] = useState<
     Record<number, number>
   >({});
-  const [paragraphEngagement, setParagraphEngagement] = useState<Record<number, boolean>>({});
+  const [paragraphEngagement, setParagraphEngagement] = useState<
+    Record<number, boolean>
+  >({});
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -68,8 +69,20 @@ To start, read this first paragraph and tell me what you think.`,
             "We're now in the 'look' phase. Let's explore the concept of algorithmic bias paragraph by paragraph. Take your time to read each section, and I'll help you understand the key points.";
           break;
         case 2:
-          phaseMessage =
-            "Now we're in the 'think' phase. This is the place to experiment. You can use the tool to create template sentences and see how language models respond differently to various demographic terms. Try creating some templates and we'll analyze the results together.";
+          phaseMessage = `Now we're in the 'think' phase. This is the place to experiment. Try running the example that is set up. It tells you how the newest version of ChatGPT will complete a sentence about different groups of students.
+            
+Then you can change the sentence and the list of groups. In your sentence, leave an asterisk (*) to show where the different group names should go in. And leave your sentence incomplete to find out how the AI will finish it. 
+            
+Here are some ideas for sentences: 
+Hiring: "As the hiring committee, on a scale of one to ten, we give the * candidate a score of: "
+College Admissions: "We, the college admissions committee, have decided that the * student should be "
+Fictional Stories: "Once upon a time there was a person named * who wanted to be a "
+
+Here are some ideas for groups:
+The names used in the Silicon Ceiling paper (Darius Mosby, Katie Burns, etc. You can ask me for more)
+The religion and caste groups used in the IndiBias paper (Muslim, Hindu, Brahmin, Vaishya, Kshatriya, Shudra)
+Any other groups you can think of
+`;
           break;
         case 3:
           phaseMessage =
@@ -193,24 +206,35 @@ ${ENGAGEMENT_GUIDANCE}`;
       if (currentPhase === 1 && newCount >= 2) {
         const allMessages = [...messages, { role: "user", content: message }];
         // Get only messages for current paragraph by filtering out system messages and assistant messages introducing new paragraphs
-        const paragraphMessages = allMessages.filter(m => {
+        const paragraphMessages = allMessages.filter((m) => {
           if (m.role === "system") return false;
-          if (m.role === "assistant" && m.content.includes(`Let's discuss paragraph`)) return false;
+          if (
+            m.role === "assistant" &&
+            m.content.includes(`Let's discuss paragraph`)
+          )
+            return false;
           // Count messages after the last paragraph change message
-          const lastParagraphMsg = [...allMessages].reverse().find(msg => 
-            msg.role === "assistant" && msg.content.includes(`Let's discuss paragraph`)
+          const lastParagraphMsg = [...allMessages]
+            .reverse()
+            .find(
+              (msg) =>
+                msg.role === "assistant" &&
+                msg.content.includes(`Let's discuss paragraph`),
+            );
+          return (
+            !lastParagraphMsg ||
+            allMessages.indexOf(m) > allMessages.indexOf(lastParagraphMsg)
           );
-          return !lastParagraphMsg || allMessages.indexOf(m) > allMessages.indexOf(lastParagraphMsg);
         });
         const engagementResult = await checkEngagement(
           ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
           paragraphMessages,
-          userId || '',
-          currentParagraph
+          userId || "",
+          currentParagraph,
         );
-        setParagraphEngagement(prev => ({
+        setParagraphEngagement((prev) => ({
           ...prev,
-          [currentParagraph]: engagementResult
+          [currentParagraph]: engagementResult,
         }));
       }
     } catch (error) {
@@ -228,11 +252,14 @@ ${ENGAGEMENT_GUIDANCE}`;
     }
   };
 
-  const checkEngagement = async (paragraphText: string, messages: Message[]) => {
+  const checkEngagement = async (
+    paragraphText: string,
+    messages: Message[],
+  ) => {
     try {
       console.log("Calling engagement check with:", {
         paragraphText: paragraphText.slice(0, 50) + "...",
-        messageCount: messages.length
+        messageCount: messages.length,
       });
       const response = await fetch("/api/check-engagement", {
         method: "POST",
@@ -241,7 +268,7 @@ ${ENGAGEMENT_GUIDANCE}`;
         },
         body: JSON.stringify({
           paragraphText,
-          messages: messages.map(m => m.content).join("\n"),
+          messages: messages.map((m) => m.content).join("\n"),
         }),
       });
 
