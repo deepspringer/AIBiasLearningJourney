@@ -36,6 +36,7 @@ To start, read this first paragraph and tell me what you think.`,
   const [paragraphMessageCounts, setParagraphMessageCounts] = useState<
     Record<number, number>
   >({});
+  const [isEngaged, setIsEngaged] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -183,10 +184,20 @@ ${ENGAGEMENT_GUIDANCE}`;
           return newMessages;
         });
       }
+      const newCount = (paragraphMessageCounts[currentParagraph] || 0) + 1;
       setParagraphMessageCounts((prevCounts) => ({
         ...prevCounts,
-        [currentParagraph]: (prevCounts[currentParagraph] || 0) + 1,
+        [currentParagraph]: newCount,
       }));
+
+      // Check engagement if we've reached the threshold
+      if (currentPhase === 1 && newCount >= 2) {
+        const engagementResult = await checkEngagement(
+          ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
+          messages.filter(m => m.role !== "system")
+        );
+        setIsEngaged(engagementResult);
+      }
     } catch (error) {
       console.error("Error sending message:", error);
       setMessages((prev) => [
@@ -313,6 +324,7 @@ ${ENGAGEMENT_GUIDANCE}`;
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
             currentPhase={currentPhase}
+            isEngaged={isEngaged}
             onFloatingActionClick={
               currentPhase === 1
                 ? () => {
