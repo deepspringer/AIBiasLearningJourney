@@ -19,16 +19,17 @@ const COLORS = [
 
 const BiasTestGraph = ({ results }: BiasTestGraphProps) => {
   const graphData = useMemo(() => {
-    // Get all unique tokens across all results
-    const allTokens = new Set<string>();
+    // Find tokens that were the highest probability for at least one demographic
+    const significantTokens = new Set<string>();
     results.forEach(result => {
-      result.topLogprobs.forEach(({ token }) => {
-        allTokens.add(token.trim() || '(space)');
-      });
+      if (result.topLogprobs.length > 0) {
+        const highestProbToken = result.topLogprobs[0].token;
+        significantTokens.add(highestProbToken.trim() || '(space)');
+      }
     });
 
-    // For each token, get its probability for each demographic
-    return Array.from(allTokens).map(token => {
+    // For each significant token, get its probability for each demographic
+    return Array.from(significantTokens).map(token => {
       const dataPoint: Record<string, any> = { token };
       
       results.forEach(result => {
@@ -51,7 +52,7 @@ const BiasTestGraph = ({ results }: BiasTestGraphProps) => {
       <h3 className="text-lg font-semibold mb-4">Token Probability Distribution</h3>
       <div className="w-full overflow-x-auto">
         <BarChart
-          width={Math.max(graphData.length * 100, 600)}
+          width={Math.max(graphData.length * 150, 600)}
           height={400}
           data={graphData}
           margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
@@ -60,7 +61,14 @@ const BiasTestGraph = ({ results }: BiasTestGraphProps) => {
           <XAxis dataKey="token" />
           <YAxis label={{ value: 'Probability (%)', angle: -90, position: 'insideLeft' }} />
           <Tooltip />
-          <Legend />
+          <Legend 
+            verticalAlign="bottom" 
+            height={36}
+            wrapperStyle={{
+              paddingTop: "20px",
+              borderTop: "1px solid #eee"
+            }}
+          />
           {results.map((result, index) => (
             <Bar
               key={result.word}
