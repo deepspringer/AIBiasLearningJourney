@@ -34,7 +34,9 @@ You should respond with a JSON object in the format:
     });
 
     const result = response.choices[0].message.content;
-    res.json(JSON.parse(result || "{}"));
+    const parsedResult = JSON.parse(result || "{}");
+    console.log("Engagement check:", parsedResult);
+    res.json(parsedResult);
   } catch (error) {
     console.error("Error in engagement check:", error);
     res.status(500).json({ error: "Failed to check engagement" });

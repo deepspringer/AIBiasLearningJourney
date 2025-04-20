@@ -316,7 +316,9 @@ ${ENGAGEMENT_GUIDANCE}`;
                       checkEngagement(
                         ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
                         messages.filter(m => m.role !== "system")
-                      ).then(canProgress => {
+                      ).then((result) => {
+                        console.log("Engagement check result:", result);
+                        const canProgress = result.engaged && result.engagement_score >= 5;
                         if (canProgress) {
                           if (currentParagraph === ALGORITHMIC_BIAS_TEXT.length) {
                             setCurrentPhase(2);
