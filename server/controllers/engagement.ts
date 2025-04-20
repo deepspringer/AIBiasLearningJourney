@@ -8,7 +8,12 @@ const openai = new OpenAI({
 
 export async function handleEngagementCheck(req: Request, res: Response) {
   try {
+    console.log("Received engagement check request");
     const { paragraphText, messages } = req.body;
+    console.log("Request body:", {
+      paragraphLength: paragraphText?.length,
+      messagesLength: messages?.length
+    });
     
     const response = await openai.chat.completions.create({
       model: "gpt-4o",

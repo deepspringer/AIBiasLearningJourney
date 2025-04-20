@@ -204,6 +204,10 @@ ${ENGAGEMENT_GUIDANCE}`;
 
   const checkEngagement = async (paragraphText: string, messages: Message[]) => {
     try {
+      console.log("Calling engagement check with:", {
+        paragraphText: paragraphText.slice(0, 50) + "...",
+        messageCount: messages.length
+      });
       const response = await fetch("/api/check-engagement", {
         method: "POST",
         headers: {
