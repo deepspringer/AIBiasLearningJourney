@@ -27,7 +27,7 @@ const AlgorithmicBiasApp = () => {
 1. LOOK: You'll read and discuss some ideas  
 2. THINK: You'll experiment with a tool to see how AI responds differently when it's talking about different kinds of people  
 3. DO: You'll write a conclusion, explaining what you found and why it matters.  
-        
+
 To start, read this first paragraph and tell me what you think.`,
     },
   ]);
@@ -115,7 +115,7 @@ To start, read this first paragraph and tell me what you think.`,
 
           Only ask one question at a time.
 
-          
+
 ${ENGAGEMENT_GUIDANCE}`;
           break;
         case 2:
@@ -139,8 +139,7 @@ ${ENGAGEMENT_GUIDANCE}`;
           Why do you think these differences exist?
           Why do you think this matters? 
 
-           As they write, you should push them to articulate the details with clarity and reference to the data they've seen.
-          As they write they can continue formulating research questions, test cases and results.
+           As they write, they can continue formulating research questions, test cases and results.
 
           _______________
           For reference, they just read this text: 
@@ -192,9 +191,10 @@ ${ENGAGEMENT_GUIDANCE}`;
 
       // Check engagement if we've reached the threshold
       if (currentPhase === 1 && newCount >= 2) {
+        const allMessages = [...messages, { role: "user", content: message }];
         const engagementResult = await checkEngagement(
           ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
-          messages.filter(m => m.role !== "system")
+          allMessages.filter(m => m.role !== "system")
         );
         setIsEngaged(engagementResult);
       }
@@ -229,11 +229,11 @@ ${ENGAGEMENT_GUIDANCE}`;
           messages: messages.map(m => m.content).join("\n"),
         }),
       });
-      
+
       if (!response.ok) {
         throw new Error("Failed to check engagement");
       }
-      
+
       const data = await response.json();
       return data.engaged && data.engagement_score >= 5;
     } catch (error) {
