@@ -328,21 +328,10 @@ ${ENGAGEMENT_GUIDANCE}`;
             onFloatingActionClick={
               currentPhase === 1
                 ? () => {
-                    if ((paragraphMessageCounts[currentParagraph] || 0) >= 2) {
-                      checkEngagement(
-                        ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
-                        messages.filter(m => m.role !== "system")
-                      ).then((result) => {
-                        console.log("Engagement check result:", result);
-                        const canProgress = result.engaged && result.engagement_score >= 5;
-                        if (canProgress) {
-                          if (currentParagraph === ALGORITHMIC_BIAS_TEXT.length) {
-                            setCurrentPhase(2);
-                          } else {
-                            handleParagraphChange(currentParagraph + 1);
-                          }
-                        }
-                      });
+                    if (currentParagraph === ALGORITHMIC_BIAS_TEXT.length) {
+                      setCurrentPhase(2);
+                    } else {
+                      handleParagraphChange(currentParagraph + 1);
                     }
                   }
                 : currentPhase === 2 && phase2Messages.length >= 10
