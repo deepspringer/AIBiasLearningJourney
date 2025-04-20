@@ -115,6 +115,7 @@ Any other groups you can think of
 
     // Add user message to the state
     setMessages((prev) => [...prev, { role: "user", content: fullMessage }]);
+    console.log("[LOG-001] Setting isMessageLoading to true before sending message");
     setIsMessageLoading(true);
 
     try {
@@ -198,6 +199,8 @@ ${ENGAGEMENT_GUIDANCE}`;
       const data = await response.json();
       const assistantMessage = { role: "assistant", content: data.message };
       setMessages((prev) => [...prev, assistantMessage]);
+      console.log("[LOG-002] Setting isMessageLoading to false after receiving AI response");
+      setIsMessageLoading(false);
 
       if (currentPhase === 2) {
         setPhase2Messages((prev) => {
@@ -263,9 +266,9 @@ ${ENGAGEMENT_GUIDANCE}`;
             "I'm sorry, I encountered an error while processing your message. Please try again.",
         },
       ]);
-    } finally {
+      console.log("[LOG-003] Setting isMessageLoading to false after error");
       setIsMessageLoading(false);
-    }
+    } 
   };
 
   const checkEngagement = async (
