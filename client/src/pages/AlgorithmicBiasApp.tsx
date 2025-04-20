@@ -70,9 +70,9 @@ To start, read this first paragraph and tell me what you think.`,
           break;
         case 2:
           phaseMessage = `Now we're in the 'think' phase. This is the place to experiment. Try running the example that is set up. It tells you how the newest version of ChatGPT will complete a sentence about different groups of students.
-            
+
 Then you can change the sentence and the list of groups. In your sentence, leave an asterisk (*) to show where the different group names should go in. And leave your sentence incomplete to find out how the AI will finish it. 
-            
+
 Here are some ideas for sentences: 
 Hiring: "As the hiring committee, on a scale of one to ten, we give the * candidate a score of: "
 College Admissions: "We, the college admissions committee, have decided that the * student should be "
@@ -100,8 +100,17 @@ Any other groups you can think of
   const handleSendMessage = async (message: string) => {
     if (!message.trim()) return;
 
+    // Get conclusion text if in Phase 3
+    const conclusionTextArea = currentPhase === 3 ? document.getElementById('conclusion') as HTMLTextAreaElement : null;
+    const conclusionText = conclusionTextArea?.value || '';
+
+    // Modify message content for Phase 3
+    const fullMessage = currentPhase === 3 
+      ? `${message}\n\nFor reference, here is my current progress on writing my conclusion:\n\n${conclusionText}`
+      : message;
+
     // Add user message to the state
-    setMessages((prev) => [...prev, { role: "user", content: message }]);
+    setMessages((prev) => [...prev, { role: "user", content: fullMessage }]);
     setIsLoading(true);
 
     try {
@@ -134,7 +143,7 @@ ${ENGAGEMENT_GUIDANCE}`;
         case 2:
           systemPrompt = `You are guiding a 9th grade student through experimenting with an online tool. In the online tool, they have two input boxes. In one they put an imcomplete template sentence, using an asterisk * as a placeholder. The sentence should be incomplete because the goal is to see how an LLM would finish the sentence differently for different demographic variables. In the other input area they put a list of demographic label--each on its own line. When they click "Run", the demographic labels are inserted in to the template sentence. Then they see the predicted next token. For example, if they put "The * student was known to be" as the template and "Asian\nWhite\nBlack\nLatino\nMale" as the demographic labels, they might see that the LLM predicts "dedicated" for Asian, "diverse" for White, and "talented" for Black and Latino. They will also see the top 20 most likely next tokens. These are likely to be partial words such as "ded", "div", "tal", "int", etc. They will also see the probability of each token. If they want to know what a token means, they can add it to the end of the template sentence and click run again. For instance, if they see "int" as a possible token, they can put "The * student was known to be int" as the template and click run again, which might result in a completion of "eresting" (interesting), "elligent" (intelligent), "roverted" (introverted) or something else.
           _______________
-          You should help them formulate new sentences and demographic labels to check, then help them interpret their outputs. You can suggest general sentences (e.g. "The * person is "), You can suggest ones related to hiring or college admissions (e.g. We the hiring committe have examined the qualifications of *, and on a scale of 1-5 have awarded them: "). You can suggest that they use demographically coded names such as the ones used in the Silicon Ceiling paper. And you can remind them of the names used there. You can suggest demographic labels related to an international context as in the IndiBias paper. (e.g. their demographic labels could be Brahmin, Vaishya, Kshatria, and Shudra). You can suggest they try making fictional stories (e.g. "Once upon a time there was a * who wanted to be a ")
+          You should help them formulate new sentences and demographic labels to check, then help them interpret their outputs. You can suggest general sentences (e.g. "The * person is "), You can suggest ones related to hiring or college admissions (e.g. We the hiring committe have examined the qualifications of *, and on a scale of 1-5 have awarded them: "). You can suggest that they use demographically coded names such as the ones used in the Silicon Ceiling paper. And you can remind them of the names used there. You can suggest demographic labels related to an international context as in the IndiBias paper. (e.g. their demographic labels could be Brahmin, Vaishya, Kshatriya, and Shudra). You can suggest they try making fictional stories (e.g. "Once upon a time there was a * who wanted to be a ")
           _______________
           For reference, they just read this text: 
           ${ALGORITHMIC_BIAS_TEXT}
@@ -170,7 +179,7 @@ ${ENGAGEMENT_GUIDANCE}`;
         },
         body: JSON.stringify({
           systemPrompt,
-          userMessage: message,
+          userMessage: fullMessage,
           phase: currentPhase,
           paragraph: currentPhase === 1 ? currentParagraph : undefined,
           chatHistory: messages.filter((msg) => msg.role !== "system"),
@@ -204,7 +213,7 @@ ${ENGAGEMENT_GUIDANCE}`;
 
       // Check engagement if we've reached the threshold
       if (currentPhase === 1 && newCount >= 2) {
-        const allMessages = [...messages, { role: "user", content: message }];
+        const allMessages = [...messages, { role: "user", content: fullMessage }];
         // Get only messages for current paragraph by filtering out system messages and assistant messages introducing new paragraphs
         const paragraphMessages = allMessages.filter((m) => {
           if (m.role === "system") return false;
