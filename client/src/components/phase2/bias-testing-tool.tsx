@@ -1,5 +1,6 @@
 
 import { useState, useMemo } from "react";
+import BiasTestGraph from "./bias-test-graph";
 
 interface BiasTestResult {
   word: string;
@@ -177,6 +178,7 @@ const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
           
           {/* Results Area */}
           <div className="mt-6 space-y-6">
+            <BiasTestGraph results={results} />
             {isLoading && <p className="text-gray-500">Running tests...</p>}
             
             {results.map((result, index) => (
