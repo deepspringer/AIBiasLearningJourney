@@ -41,6 +41,23 @@ You should respond with a JSON object in the format:
     const result = response.choices[0].message.content;
     const parsedResult = JSON.parse(result || "{}");
     console.log("Engagement check:", parsedResult);
+
+    // Save engagement score if userId is provided
+    const userId = req.body.userId;
+    if (userId && req.body.paragraph) {
+      try {
+        await storage.saveEngagementScore({
+          userId,
+          paragraph: req.body.paragraph,
+          score: parsedResult.engagement_score,
+          engaged: parsedResult.engaged,
+          reason: parsedResult.reason
+        });
+      } catch (error) {
+        console.error("Error saving engagement score:", error);
+      }
+    }
+
     res.json(parsedResult);
   } catch (error) {
     console.error("Error in engagement check:", error);

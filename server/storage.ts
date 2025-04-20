@@ -92,6 +92,22 @@ export class DatabaseStorage implements IStorage {
       .where(eq(messages.userId, userId))
       .orderBy(messages.createdAt as any);  // Type assertion to bypass ordering issue
   }
+
+  async saveEngagementScore(score: InsertEngagementScore): Promise<EngagementScore> {
+    const [savedScore] = await db
+      .insert(engagementScores)
+      .values(score)
+      .returning();
+    return savedScore;
+  }
+
+  async getEngagementScores(userId: number): Promise<EngagementScore[]> {
+    return db
+      .select()
+      .from(engagementScores)
+      .where(eq(engagementScores.userId, userId))
+      .orderBy(engagementScores.createdAt as any);
+  }
 }
 
 export const storage = new DatabaseStorage();

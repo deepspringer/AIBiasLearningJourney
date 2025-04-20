@@ -72,3 +72,25 @@ export const insertMessageSchema = createInsertSchema(messages).pick({
 
 export type InsertMessage = z.infer<typeof insertMessageSchema>;
 export type Message = typeof messages.$inferSelect;
+
+// Define engagement scores table
+export const engagementScores = pgTable("engagement_scores", {
+  id: serial("id").primaryKey(),
+  userId: integer("user_id").references(() => users.id).notNull(),
+  paragraph: integer("paragraph").notNull(),
+  score: integer("score").notNull(),
+  engaged: boolean("engaged").notNull(),
+  reason: text("reason"),
+  createdAt: timestamp("created_at").defaultNow(),
+});
+
+export const insertEngagementScoreSchema = createInsertSchema(engagementScores).pick({
+  userId: true,
+  paragraph: true,
+  score: true,
+  engaged: true,
+  reason: true,
+});
+
+export type InsertEngagementScore = z.infer<typeof insertEngagementScoreSchema>;
+export type EngagementScore = typeof engagementScores.$inferSelect;

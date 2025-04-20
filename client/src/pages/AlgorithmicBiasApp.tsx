@@ -204,7 +204,9 @@ ${ENGAGEMENT_GUIDANCE}`;
         });
         const engagementResult = await checkEngagement(
           ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
-          paragraphMessages
+          paragraphMessages,
+          userId || '',
+          currentParagraph
         );
         setParagraphEngagement(prev => ({
           ...prev,
