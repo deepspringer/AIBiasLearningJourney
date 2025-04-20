@@ -38,7 +38,7 @@ To start, read this first paragraph and tell me what you think.`,
   const [paragraphEngagement, setParagraphEngagement] = useState<
     Record<number, boolean>
   >({});
-  const [isLoading, setIsLoading] = useState(false);
+  const [isMessageLoading, setIsMessageLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
 
@@ -115,7 +115,7 @@ Any other groups you can think of
 
     // Add user message to the state
     setMessages((prev) => [...prev, { role: "user", content: fullMessage }]);
-    setIsLoading(true);
+    setIsMessageLoading(true);
 
     try {
       // Track phase 2 messages separately
@@ -264,7 +264,7 @@ ${ENGAGEMENT_GUIDANCE}`;
         },
       ]);
     } finally {
-      setIsLoading(false);
+      setIsMessageLoading(false);
     }
   };
 
@@ -380,7 +380,7 @@ ${ENGAGEMENT_GUIDANCE}`;
           <ChatPanel
             messages={messages}
             onSendMessage={handleSendMessage}
-            isLoading={isLoading}
+            isLoading={isMessageLoading}
             currentPhase={currentPhase}
             isEngaged={paragraphEngagement[currentParagraph] || false}
             messageCount={paragraphMessageCounts[currentParagraph] || 0}
