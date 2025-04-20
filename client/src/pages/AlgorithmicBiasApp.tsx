@@ -36,7 +36,7 @@ To start, read this first paragraph and tell me what you think.`,
   const [paragraphMessageCounts, setParagraphMessageCounts] = useState<
     Record<number, number>
   >({});
-  const [isEngaged, setIsEngaged] = useState(false);
+  const [paragraphEngagement, setParagraphEngagement] = useState<Record<number, boolean>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -196,7 +196,10 @@ ${ENGAGEMENT_GUIDANCE}`;
           ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
           allMessages.filter(m => m.role !== "system")
         );
-        setIsEngaged(engagementResult);
+        setParagraphEngagement(prev => ({
+          ...prev,
+          [currentParagraph]: engagementResult
+        }));
       }
     } catch (error) {
       console.error("Error sending message:", error);
@@ -324,7 +327,7 @@ ${ENGAGEMENT_GUIDANCE}`;
             onSendMessage={handleSendMessage}
             isLoading={isLoading}
             currentPhase={currentPhase}
-            isEngaged={isEngaged}
+            isEngaged={paragraphEngagement[currentParagraph] || false}
             onFloatingActionClick={
               currentPhase === 1
                 ? () => {
