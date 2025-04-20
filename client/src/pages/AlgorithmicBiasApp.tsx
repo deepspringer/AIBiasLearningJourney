@@ -367,6 +367,7 @@ ${ENGAGEMENT_GUIDANCE}`;
             isLoading={isLoading}
             currentPhase={currentPhase}
             isEngaged={paragraphEngagement[currentParagraph] || false}
+            messageCount={paragraphMessageCounts[currentParagraph] || 0}
             onFloatingActionClick={
               currentPhase === 1
                 ? () => {

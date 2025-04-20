@@ -7,13 +7,14 @@ interface ChatPanelProps {
   messages: Message[];
   onSendMessage: (message: string) => void;
   isLoading: boolean;
-  onFloatingActionClick?: () => void;
-  isLastParagraph?: boolean;
   currentPhase: number;
   isEngaged: boolean;
+  onFloatingActionClick?: () => void;
+  isLastParagraph?: boolean;
+  messageCount?: number;
 }
 
-const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph, currentPhase, isEngaged }: ChatPanelProps) => {
+const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph, currentPhase, isEngaged, messageCount = 0 }: ChatPanelProps) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
@@ -72,7 +73,7 @@ const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, 
                 </div>
               </div>
             )}
-            
+
             <div
               className={`${
                 message.role === "user"
@@ -90,7 +91,7 @@ const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, 
                 </div>
               )}
             </div>
-            
+
             {message.role === "user" && (
               <div className="flex-shrink-0 ml-3">
                 <div className="h-8 w-8 rounded-full bg-gray-300 flex items-center justify-center">
@@ -128,13 +129,13 @@ const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, 
             </div>
           </div>
         )}
-        
+
         <div ref={messagesEndRef} />
       </div>
 
       {/* Floating Action Button */}
       <div className="sticky bottom-20 flex justify-center p-4">
-        {onFloatingActionClick && isEngaged && (
+        {onFloatingActionClick && (messageCount >= 6 || isEngaged) && (
           <button
             onClick={onFloatingActionClick}
             className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-600 transition-colors"
