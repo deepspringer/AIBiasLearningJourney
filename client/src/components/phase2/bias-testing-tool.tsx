@@ -180,6 +180,7 @@ const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
           <div className="mt-6 space-y-6">
             <BiasTestGraph results={results} />
             {isLoading && <p className="text-gray-500">Running tests...</p>}
+            <div className="space-y-6">
             
             {results.map((result, index) => (
               <div key={index} className="result border rounded-lg overflow-hidden shadow-sm">
@@ -199,6 +200,8 @@ const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
                 </div>
               </div>
             ))}
+            </div>
+            <BiasTestGraph results={results} />
           </div>
         </div>
       </div>
