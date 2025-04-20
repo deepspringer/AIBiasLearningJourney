@@ -23,12 +23,19 @@ const AlgorithmicBiasApp = () => {
     {
       role: "assistant",
       content:
-        "Welcome to the Algorithmic Bias Learning Platform! I'm here to guide you through understanding algorithmic bias. Let's start by exploring some key concepts. Ready to begin?",
+      `Hi. I'm here to teach you about bias in Artificial Intelligence. We'll do three things:  
+1. LOOK: You'll read and discuss some ideas  
+2. THINK: You'll experiment with a tool to see how AI responds differently when it's talking about different kinds of people  
+3. DO: You'll write a conclusion, explaining what you found and why it matters.  
+        
+To start, read this first paragraph and tell me what you think.`,
     },
   ]);
   const [phase2Messages, setPhase2Messages] = useState<Message[]>([]);
   const [currentParagraph, setCurrentParagraph] = useState(1);
-  const [paragraphMessageCounts, setParagraphMessageCounts] = useState<Record<number, number>>({});
+  const [paragraphMessageCounts, setParagraphMessageCounts] = useState<
+    Record<number, number>
+  >({});
   const [isLoading, setIsLoading] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
@@ -86,9 +93,12 @@ const AlgorithmicBiasApp = () => {
     try {
       // Track phase 2 messages separately
       if (currentPhase === 2) {
-        setPhase2Messages(prev => {
+        setPhase2Messages((prev) => {
           const newMessages = [...prev, { role: "user", content: message }];
-          console.log("[Debug] Phase 2 messages after user message:", newMessages.length);
+          console.log(
+            "[Debug] Phase 2 messages after user message:",
+            newMessages.length,
+          );
           return newMessages;
         });
       }
@@ -98,13 +108,45 @@ const AlgorithmicBiasApp = () => {
 
       switch (currentPhase) {
         case 1:
-          systemPrompt = `You are helping to guide a student through a text about algorithmic bias paragraph by paragraph. ${ENGAGEMENT_GUIDANCE}`;
+          systemPrompt = `You are helping to guide a 9th grade student through a text about algorithmic bias paragraph-by-paragraph. Start with open ended questions (e.g. "What do you think this is saying", "Have you heard of this idea before"), but if they struggle, provide more specific comprehension questions. (e.g. "Does the reading say that LLMs are always predictable or that they include some randomness?"). You can also ask them to speculate about the ideas. (e.g. "What do you think would happen if LLMs were always predictable?", "What kinds of sources on the internet might 'teach' and LLM to say biased things?")
+
+          Do not repeat the text of the paragraph. They have it displayed above. 
+
+          Only ask one question at a time.
+
+          
+${ENGAGEMENT_GUIDANCE}`;
           break;
         case 2:
-          systemPrompt = `You are guiding a student through experimenting with an online tool. In the online tool, they have two input boxes. In one they put a template sentence, in the other they put a comma-separated list of demographic labels. Then they see the predicted next token. You should help them formulate new sentences and demographic labels to check, then help them interpret their outputs. ${ENGAGEMENT_GUIDANCE}`;
+          systemPrompt = `You are guiding a 9th grade student through experimenting with an online tool. In the online tool, they have two input boxes. In one they put an imcomplete template sentence, using an asterisk * as a placeholder. The sentence should be incomplete because the goal is to see how an LLM would finish the sentence differently for different demographic variables. In the other input area they put a list of demographic label--each on its own line. When they click "Run", the demographic labels are inserted in to the template sentence. Then they see the predicted next token. For example, if they put "The * student was known to be" as the template and "Asian\nWhite\nBlack\nLatino\nMale" as the demographic labels, they might see that the LLM predicts "dedicated" for Asian, "diverse" for White, and "talented" for Black and Latino. They will also see the top 20 most likely next tokens. These are likely to be partial words such as "ded", "div", "tal", "int", etc. They will also see the probability of each token. If they want to know what a token means, they can add it to the end of the template sentence and click run again. For instance, if they see "int" as a possible token, they can put "The * student was known to be int" as the template and click run again, which might result in a completion of "eresting" (interesting), "elligent" (intelligent), "roverted" (introverted) or something else.
+          _______________
+          You should help them formulate new sentences and demographic labels to check, then help them interpret their outputs. You can suggest general sentences (e.g. "The * person is "), You can suggest ones related to hiring or college admissions (e.g. We the hiring committe have examined the qualifications of *, and on a scale of 1-5 have awarded them: "). You can suggest that they use demographically coded names such as the ones used in the Silicon Ceiling paper. And you can remind them of the names used there. You can suggest demographic labels related to an international context as in the IndiBias paper. (e.g. their demographic labels could be Brahmin, Vaishya, Kshatria, and Shudra). You can suggest they try making fictional stories (e.g. "Once upon a time there was a * who wanted to be a ")
+          _______________
+          For reference, they just read this text: 
+          ${ALGORITHMIC_BIAS_TEXT}
+          _______________
+          As you talk to them, follow this guidance:
+          ${ENGAGEMENT_GUIDANCE}`;
           break;
         case 3:
-          systemPrompt = `You are helping a student to write a conclusion based on the work they've done in the previous two phases. Do not write any sentences for their conclusion. They must write all the text. I repeat: Do NOT write any sentences for their conclusion. They must write all the text. Your bias should be toward asking questions rather than giving advice. Only ever ask one question at a time. ${ENGAGEMENT_GUIDANCE}`;
+          systemPrompt = `You are helping a 9th grade student to write a conclusion based on the work they've done in the previous two phases. Do not write any sentences for their conclusion. They must write all the text. I repeat: Do NOT write any sentences for their conclusion. They must write all the text. Your bias should be toward asking questions rather than giving advice. Only ever ask one question at a time. 
+
+          The students should write a conclusion that answers these questions: 
+          What did you learn about algorithmic bias and AI?
+          What experiments did you do with the bias tool?
+          What differences did you see in the AI's responses to different demographic labels?
+          Why do you think these differences exist?
+          Why do you think this matters? 
+
+           As they write, you should push them to articulate the details with clarity and reference to the data they've seen.
+          As they write they can continue formulating research questions, test cases and results.
+
+          _______________
+          For reference, they just read this text: 
+          ${ALGORITHMIC_BIAS_TEXT}
+          _______________
+          As you talk to them, follow this guidance:
+          ${ENGAGEMENT_GUIDANCE}`;
           break;
       }
 
@@ -132,9 +174,12 @@ const AlgorithmicBiasApp = () => {
       setMessages((prev) => [...prev, assistantMessage]);
 
       if (currentPhase === 2) {
-        setPhase2Messages(prev => {
+        setPhase2Messages((prev) => {
           const newMessages = [...prev, assistantMessage];
-          console.log("[Debug] Phase 2 messages after assistant response:", newMessages.length);
+          console.log(
+            "[Debug] Phase 2 messages after assistant response:",
+            newMessages.length,
+          );
           return newMessages;
         });
       }
@@ -171,7 +216,6 @@ const AlgorithmicBiasApp = () => {
       ...prevCounts,
       [newParagraph]: 0, //Reset count for new paragraph
     }));
-
   };
 
   return (
@@ -188,8 +232,16 @@ const AlgorithmicBiasApp = () => {
               <PhaseNavigation
                 currentPhase={currentPhase}
                 onPhaseChange={setCurrentPhase}
-                isPhase2Unlocked={currentPhase === 2 || (currentPhase === 1 && currentParagraph === ALGORITHMIC_BIAS_TEXT.length && (paragraphMessageCounts[currentParagraph] || 0) >= 2)}
-                isPhase3Unlocked={currentPhase === 3 || (currentPhase === 2 && phase2Messages.length >= 10)}
+                isPhase2Unlocked={
+                  currentPhase === 2 ||
+                  (currentPhase === 1 &&
+                    currentParagraph === ALGORITHMIC_BIAS_TEXT.length &&
+                    (paragraphMessageCounts[currentParagraph] || 0) >= 2)
+                }
+                isPhase3Unlocked={
+                  currentPhase === 3 ||
+                  (currentPhase === 2 && phase2Messages.length >= 10)
+                }
               />
 
               {/* User info and logout */}
@@ -199,7 +251,7 @@ const AlgorithmicBiasApp = () => {
                     Welcome, {displayName}
                   </div>
                 )}
-                <Button 
+                <Button
                   variant="outline"
                   size="sm"
                   onClick={() => {
@@ -255,7 +307,9 @@ const AlgorithmicBiasApp = () => {
                 paragraphMessageCounts={paragraphMessageCounts} // Pass message counts to TextReader
               />
             )}
-            {currentPhase === 2 && <BiasTestingTool onSendMessage={handleSendMessage} />}
+            {currentPhase === 2 && (
+              <BiasTestingTool onSendMessage={handleSendMessage} />
+            )}
             {currentPhase === 3 && <ConclusionWriter />}
           </PhaseContent>
         </div>
