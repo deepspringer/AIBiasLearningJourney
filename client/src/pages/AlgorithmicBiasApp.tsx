@@ -101,13 +101,17 @@ Any other groups you can think of
     if (!message.trim()) return;
 
     // Get conclusion text if in Phase 3
-    const conclusionTextArea = currentPhase === 3 ? document.getElementById('conclusion') as HTMLTextAreaElement : null;
-    const conclusionText = conclusionTextArea?.value || '';
+    const conclusionTextArea =
+      currentPhase === 3
+        ? (document.getElementById("conclusion") as HTMLTextAreaElement)
+        : null;
+    const conclusionText = conclusionTextArea?.value || "";
 
     // Modify message content for Phase 3
-    const fullMessage = currentPhase === 3 
-      ? `${message}\n\nFor reference, here is my current progress on writing my conclusion:\n\n${conclusionText}`
-      : message;
+    const fullMessage =
+      currentPhase === 3
+        ? `${message}\n\nFor reference, here is my current progress on writing my conclusion:\n\n${conclusionText}`
+        : message;
 
     // Add user message to the state
     setMessages((prev) => [...prev, { role: "user", content: fullMessage }]);
@@ -213,7 +217,10 @@ ${ENGAGEMENT_GUIDANCE}`;
 
       // Check engagement if we've reached the threshold
       if (currentPhase === 1 && newCount >= 2) {
-        const allMessages = [...messages, { role: "user", content: fullMessage }];
+        const allMessages = [
+          ...messages,
+          { role: "user", content: fullMessage },
+        ];
         // Get only messages for current paragraph by filtering out system messages and assistant messages introducing new paragraphs
         const paragraphMessages = allMessages.filter((m) => {
           if (m.role === "system") return false;
@@ -300,7 +307,7 @@ ${ENGAGEMENT_GUIDANCE}`;
       ...prev,
       {
         role: "assistant",
-        content: `Let's discuss paragraph ${newParagraph}. What do you think is the main point here? How does it relate to what you already know about algorithmic bias?`,
+        content: `Here is section ${newParagraph}. Read it and let me know what your thoughts and questions are.`,
       },
     ]);
     setParagraphMessageCounts((prevCounts) => ({
