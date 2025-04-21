@@ -69,19 +69,19 @@ To start, read this first paragraph and tell me what you think.`,
             "We're now in the 'look' phase. Let's explore the concept of algorithmic bias paragraph by paragraph. Take your time to read each section, and I'll help you understand the key points.";
           break;
         case 2:
-          phaseMessage = `Now we're in the 'think' phase. This is the place to experiment. Try running the example that is set up. It tells you how the newest version of ChatGPT will complete a sentence about different groups of students.
+          phaseMessage = `Now we're in the 'think' phase. This is the place to experiment. Try running the example that is set up. It tells you how the newest version of ChatGPT will complete a sentence about different groups of students.  
 
-Then you can change the sentence and the list of groups. In your sentence, leave an asterisk (*) to show where the different group names should go in. And leave your sentence incomplete to find out how the AI will finish it. 
+Then you can change the sentence and the list of groups. In your sentence, leave an asterisk (*) to show where the different group names should go in. And leave your sentence incomplete to find out how the AI will finish it.   
 
-Here are some ideas for sentences: 
-Hiring: "As the hiring committee, on a scale of one to ten, we give the * candidate a score of: "
-College Admissions: "We, the college admissions committee, have decided that the * student should be "
-Fictional Stories: "Once upon a time there was a person named * who wanted to be a "
+Here are some ideas for sentences:   
+Hiring: "As the hiring committee, on a scale of one to ten, we give the * candidate a score of: "  
+College Admissions: "We, the college admissions committee, have decided that the * student should be "  
+Fictional Stories: "Once upon a time there was a person named * who wanted to be a "  
 
-Here are some ideas for groups:
-The names used in the Silicon Ceiling paper (Darius Mosby, Katie Burns, etc. You can ask me for more)
-The religion and caste groups used in the IndiBias paper (Muslim, Hindu, Brahmin, Vaishya, Kshatriya, Shudra)
-Any other groups you can think of
+Here are some ideas for groups:  
+The names used in the Silicon Ceiling paper (Darius Mosby, Katie Burns, etc. You can ask me for more)  
+The religion and caste groups used in the IndiBias paper (Muslim, Hindu, Brahmin, Vaishya, Kshatriya, Shudra, High Caste, Low Caste)  
+Any other groups you can think of  
 `;
           break;
         case 3:
@@ -115,7 +115,6 @@ Any other groups you can think of
 
     // Add user message to the state
     setMessages((prev) => [...prev, { role: "user", content: fullMessage }]);
-    console.log("[LOG-001] Setting isMessageLoading to true before sending message");
     setIsMessageLoading(true);
 
     try {
@@ -199,7 +198,6 @@ ${ENGAGEMENT_GUIDANCE}`;
       const data = await response.json();
       const assistantMessage = { role: "assistant", content: data.message };
       setMessages((prev) => [...prev, assistantMessage]);
-      console.log("[LOG-002] Setting isMessageLoading to false after receiving AI response");
       setIsMessageLoading(false);
 
       if (currentPhase === 2) {
@@ -266,9 +264,8 @@ ${ENGAGEMENT_GUIDANCE}`;
             "I'm sorry, I encountered an error while processing your message. Please try again.",
         },
       ]);
-      console.log("[LOG-003] Setting isMessageLoading to false after error");
       setIsMessageLoading(false);
-    } 
+    }
   };
 
   const checkEngagement = async (
@@ -276,10 +273,6 @@ ${ENGAGEMENT_GUIDANCE}`;
     messages: Message[],
   ) => {
     try {
-      console.log("Calling engagement check with:", {
-        paragraphText: paragraphText.slice(0, 50) + "...",
-        messageCount: messages.length,
-      });
       const response = await fetch("/api/check-engagement", {
         method: "POST",
         headers: {
@@ -296,7 +289,8 @@ ${ENGAGEMENT_GUIDANCE}`;
       }
 
       const data = await response.json();
-      return data.engaged && data.engagement_score >= 5;
+      console.log("Engagement data:", data);
+      return data.engaged;
     } catch (error) {
       console.error("Error checking engagement:", error);
       return true; // Fallback to allow progression if check fails
@@ -310,7 +304,7 @@ ${ENGAGEMENT_GUIDANCE}`;
       ...prev,
       {
         role: "assistant",
-        content: `Here is section ${newParagraph}. Read it and let me know what your thoughts and questions are.`,
+        content: `Here is section ${newParagraph}.   Read it and let me know what your thoughts and questions are.`,
       },
     ]);
     setParagraphMessageCounts((prevCounts) => ({
