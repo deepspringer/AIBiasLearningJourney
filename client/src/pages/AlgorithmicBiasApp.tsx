@@ -107,6 +107,22 @@ Any other groups you can think of
         : null;
     const conclusionText = conclusionTextArea?.value || "";
 
+    // Auto-save conclusion in Phase 3
+    if (currentPhase === 3 && conclusionText) {
+      try {
+        await fetch("/api/save-conclusion", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ conclusion: conclusionText }),
+        });
+      } catch (error) {
+        console.error("Error auto-saving conclusion:", error);
+        // Continue with message sending even if save fails
+      }
+    }
+
     // Modify message content for Phase 3
     const fullMessage =
       currentPhase === 3
