@@ -1,11 +1,6 @@
 import { ALGORITHMIC_BIAS_TEXT } from "@/constants/text-content";
-import StaticBiasGraph from "./static-bias-graph";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-
-const components = {
-  StaticBiasGraph: StaticBiasGraph
-};
 
 interface TextReaderProps {
   currentParagraph: number;
@@ -87,7 +82,7 @@ const TextReader = ({ currentParagraph, onParagraphChange, paragraphMessageCount
               }`}
             >
               <div className="prose prose-lg max-w-none">
-                <ReactMarkdown components={components} remarkPlugins={[remarkGfm]}>
+                <ReactMarkdown remarkPlugins={[remarkGfm]}>
                   {paragraph}
                 </ReactMarkdown>
               </div>
