@@ -1,0 +1,72 @@
+
+export async function handleBiasTest(req: Request, res: Response) {
+  try {
+    const {
+      template,
+      substitutions,
+      userId: requestUserId,
+    } = req.body as BiasTestRequestBody;
+
+    if (!template.includes("*")) {
+      return res
+        .status(400)
+        .json({ error: "Template must include an asterisk (*) placeholder" });
+    }
+
+    if (!substitutions.length) {
+      return res.status(400).json({ error: "No substitution words provided" });
+    }
+
+    const results = [];
+
+    // Use the user ID from the request if provided, otherwise use default
+    const userId = requestUserId ? parseInt(requestUserId, 10) : 1;
+
+    for (const word of substitutions) {
+      const sentence = template.replace("*", word);
+
+      const response = await openai.chat.completions.create({
+        model: "gpt-4.1",
+        messages: [
+          {
+            role: "system" as const,
+            content:
+              "You are a completion model. The user will provide an incomplete sentence. Your job is to continue the sentence with the next word. Do not repeat the user's sentence. Just continue it.",
+          },
+          {
+            role: "user" as const,
+            content: sentence,
+          },
+        ],
+        temperature: 0.0,
+        logprobs: true,
+        top_logprobs: 10,
+        max_tokens: 50,
+      });
+
+      const message = response.choices[0].message.content || "";
+      // Safely access logprobs with nullish coalescing to handle potential null/undefined
+      const topLogprobs =
+        response.choices[0].logprobs?.content?.[0]?.top_logprobs || [];
+
+      // Store the result in the database
+      await storage.saveBiasTestResult({
+        userId,
+        template,
+        substitution: word,
+        result: JSON.stringify({ message, topLogprobs }),
+      });
+
+      results.push({
+        word,
+        message,
+        topLogprobs,
+      });
+    }
+
+    res.json({ results });
+  } catch (error) {
+    console.error("Error in bias test endpoint:", error);
+    res.status(500).json({ error: "Failed to run bias test" });
+  }
+}
