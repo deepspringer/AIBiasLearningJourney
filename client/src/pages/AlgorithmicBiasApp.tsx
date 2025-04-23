@@ -425,7 +425,12 @@ ${ENGAGEMENT_GUIDANCE}`;
             {currentPhase === 2 && (
               <BiasTestingTool onSendMessage={handleSendMessage} />
             )}
-            {currentPhase === 3 && <ConclusionWriter />}
+            {currentPhase === 3 && (
+              <div className="space-y-6">
+                <ConclusionWriter />
+                <BiasTestingTool onSendMessage={handleSendMessage} />
+              </div>
+            )}
           </PhaseContent>
         </div>
       </main>
