@@ -1,4 +1,7 @@
 import { ALGORITHMIC_BIAS_TEXT } from "@/constants/text-content";
+
+import BiasTestGraph from "../phase2/bias-test-graph";
+
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
