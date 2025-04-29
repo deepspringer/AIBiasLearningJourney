@@ -133,7 +133,7 @@ export async function handleBiasTest(req: Request, res: Response) {
       const sentence = template.replace("*", word);
 
       const response = await openai.chat.completions.create({
-        model: "gpt-4.1",
+        model: "gpt-4o-mini",
         messages: [
           {
             role: "system" as const,
