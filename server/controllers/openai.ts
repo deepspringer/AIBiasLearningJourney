@@ -187,8 +187,11 @@ export async function handleSaveConclusion(req: Request, res: Response) {
       return res.status(400).json({ error: "No conclusion provided" });
     }
 
-    // Use the user ID from the request if provided, otherwise use default
-    const userId = requestUserId ? parseInt(requestUserId, 10) : 1;
+    // Require user ID for saving conclusions
+    if (!requestUserId) {
+      return res.status(400).json({ error: "User ID is required" });
+    }
+    const userId = parseInt(requestUserId, 10);
 
     const savedConclusion = await storage.saveConclusion({
       userId,

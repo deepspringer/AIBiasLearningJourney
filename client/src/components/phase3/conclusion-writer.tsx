@@ -19,7 +19,10 @@ const ConclusionWriter = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ conclusion }),
+        body: JSON.stringify({ 
+          conclusion,
+          userId: localStorage.getItem('userId')
+        }),
       });
 
       if (!response.ok) {
