@@ -46,10 +46,12 @@ export class DatabaseStorage implements IStorage {
   }
   
   async saveConclusion(conclusion: InsertConclusion): Promise<Conclusion> {
+    console.log("[Storage] Attempting to save conclusion with userId:", conclusion.userId);
     const [savedConclusion] = await db
       .insert(conclusions)
       .values(conclusion)
       .returning();
+    console.log("[Storage] Saved conclusion:", savedConclusion);
     return savedConclusion;
   }
   

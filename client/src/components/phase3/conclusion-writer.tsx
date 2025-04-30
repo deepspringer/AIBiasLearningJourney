@@ -14,6 +14,9 @@ const ConclusionWriter = () => {
     setIsSaving(true);
 
     try {
+      const userId = localStorage.getItem('userId');
+      console.log("[Client] Sending conclusion with userId:", userId);
+      
       const response = await fetch("/api/save-conclusion", {
         method: "POST",
         headers: {
@@ -21,7 +24,7 @@ const ConclusionWriter = () => {
         },
         body: JSON.stringify({ 
           conclusion,
-          userId: localStorage.getItem('userId')
+          userId
         }),
       });
 

@@ -180,6 +180,7 @@ export async function handleBiasTest(req: Request, res: Response) {
 
 export async function handleSaveConclusion(req: Request, res: Response) {
   try {
+    console.log("[Server] Received request body:", req.body);
     const { conclusion, userId: requestUserId } =
       req.body as SaveConclusionRequestBody;
 
@@ -189,10 +190,14 @@ export async function handleSaveConclusion(req: Request, res: Response) {
 
     // Require user ID for saving conclusions
     if (!requestUserId) {
+      console.log("[Server] No userId provided in request");
       return res.status(400).json({ error: "User ID is required" });
     }
+    
     const userId = parseInt(requestUserId, 10);
+    console.log("[Server] Parsed userId:", userId);
 
+    console.log("[Server] Saving conclusion with userId:", userId);
     const savedConclusion = await storage.saveConclusion({
       userId,
       content: conclusion,
