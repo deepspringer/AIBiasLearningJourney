@@ -370,7 +370,7 @@ ${ENGAGEMENT_GUIDANCE}`;
                     currentParagraph === ALGORITHMIC_BIAS_TEXT.length &&
                     (paragraphMessageCounts[currentParagraph] || 0) >= 2)
                 }
-                isPhase3Unlocked={true} // Temporarily enabled for testing
+                isPhase3Unlocked={currentPhase === 3 || phase2Messages.length >= 10}
               />
 
               {/* User info and logout */}
