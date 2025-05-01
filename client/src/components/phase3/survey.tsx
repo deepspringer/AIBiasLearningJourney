@@ -46,7 +46,7 @@ const Survey = ({ onPhaseChange }: SurveyProps) => {
       surveyContent += `What was valuable:\n${valuable || "No response"}\n\n`;
       surveyContent += `What could be improved:\n${improvements || "No response"}`;
 
-      const response = const response = await fetch("/api/save-message", {
+      const response = await fetch("/api/save-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
