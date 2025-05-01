@@ -167,7 +167,10 @@ const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, 
 
       {/* Floating Action Button */}
       <div className="sticky bottom-20 flex justify-center p-4">
-        {onFloatingActionClick && (messageCount >= 6 || isEngaged) && (
+        {onFloatingActionClick && (
+          (currentPhase === 1 && (messageCount >= 6 || isEngaged)) || 
+          (currentPhase === 2 && messageCount >= 10)
+        ) && (
           <button
             onClick={onFloatingActionClick}
             className="bg-primary text-white px-4 py-2 rounded-full shadow-lg hover:bg-blue-600 transition-colors"
