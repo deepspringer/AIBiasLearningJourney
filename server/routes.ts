@@ -3,8 +3,7 @@ import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { handleChat, handleBiasTest, handleSaveConclusion } from "./controllers/openai";
 import { handleLogin } from "./controllers/auth";
-import { handleEngagementCheck } from "./controllers/engagement";
-import { handleValidateConclusion } from "./controllers/conclusion";
+import {handleEngagementCheck} from "./controllers/engagement"; // Added import
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
@@ -21,10 +20,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/save-conclusion", handleSaveConclusion);
 
   // Engagement check endpoint
-  app.post("/api/check-engagement", handleEngagementCheck);
-
-  // Conclusion validation endpoint
-  app.post("/api/validate-conclusion", handleValidateConclusion);
+  app.post("/api/check-engagement", handleEngagementCheck); // Added route
 
   const httpServer = createServer(app);
 

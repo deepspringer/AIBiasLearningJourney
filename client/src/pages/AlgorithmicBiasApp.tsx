@@ -23,9 +23,9 @@ const AlgorithmicBiasApp = () => {
     {
       role: "assistant",
       content: `Hi. I'm here to teach you about bias in Artificial Intelligence. We'll do three things:  
-1. LEARN: You'll read and discuss some ideas  
-2. EXPERIMENT: You'll experiment with a tool to see how AI responds differently when it's talking about different kinds of people  
-3. CONCLUDE: You'll write a conclusion, explaining what you found and why it matters.  
+1. LOOK: You'll read and discuss some ideas  
+2. THINK: You'll experiment with a tool to see how AI responds differently when it's talking about different kinds of people  
+3. DO: You'll write a conclusion, explaining what you found and why it matters.  
 
 To start, read this first paragraph and tell me what you think.`,
     },
@@ -66,10 +66,10 @@ To start, read this first paragraph and tell me what you think.`,
       switch (currentPhase) {
         case 1:
           phaseMessage =
-            "We're now in the 'learn' phase. Let's explore the concept of algorithmic bias paragraph by paragraph. Take your time to read each section, and I'll help you understand the key points.";
+            "We're now in the 'look' phase. Let's explore the concept of algorithmic bias paragraph by paragraph. Take your time to read each section, and I'll help you understand the key points.";
           break;
         case 2:
-          phaseMessage = `Now we're in the 'experiment' phase. Try running the example that is set up. It tells you how the newest version of ChatGPT will complete a sentence about different groups of students.  
+          phaseMessage = `Now we're in the 'think' phase. This is the place to experiment. Try running the example that is set up. It tells you how the newest version of ChatGPT will complete a sentence about different groups of students.  
 
 Then you can change the sentence and the list of groups. In your sentence, leave an asterisk (*) to show where the different group names should go in. And leave your sentence incomplete to find out how the AI will finish it.   
 
@@ -86,7 +86,7 @@ Any other groups you can think of
           break;
         case 3:
           phaseMessage =
-            "Now we're in the 'conclude' phase. It's time to write your conclusion based on what you've learned. What were your key takeaways from the reading and experiments? What surprised you about algorithmic bias?";
+            "Now we're in the 'do' phase. It's time to write your conclusion based on what you've learned. What were your key takeaways from the reading and experiments? What surprised you about algorithmic bias?";
           break;
       }
 
