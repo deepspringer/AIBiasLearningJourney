@@ -1,6 +1,11 @@
 import { useState } from "react";
+import Survey from "./survey";
 
-const ConclusionWriter = () => {
+interface ConclusionWriterProps {
+  onShowSurvey: () => void;
+}
+
+const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
   const [conclusion, setConclusion] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
@@ -43,9 +48,7 @@ const ConclusionWriter = () => {
     }
   };
 
-  if (showSurvey) {
-    return <Survey />;
-  }
+  
 
   return (
     <div id="phase-3" className="phase-content">
@@ -186,7 +189,7 @@ It is important because..."
             </button>
             {isSaved && (
               <button
-                onClick={() => setShowSurvey(true)}
+                onClick={onShowSurvey}
                 className="ml-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center"
               >
                 <span className="mr-2">
@@ -205,7 +208,7 @@ It is important because..."
                     <path d="m12 5 7 7-7 7"></path>
                   </svg>
                 </span>
-                Finish
+                Save and Continue
               </button>
             )}
           </div>

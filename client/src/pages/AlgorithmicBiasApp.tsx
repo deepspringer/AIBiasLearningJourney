@@ -19,6 +19,14 @@ export type Message = {
 
 const AlgorithmicBiasApp = () => {
   const [currentPhase, setCurrentPhase] = useState<Phase>(1);
+  const [showingSurvey, setShowingSurvey] = useState(false);
+
+  const scrollToBottom = () => {
+    const chatMessages = document.querySelector('.chat-messages');
+    if (chatMessages) {
+      chatMessages.scrollTop = chatMessages.scrollHeight;
+    }
+  };
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
@@ -427,8 +435,22 @@ ${ENGAGEMENT_GUIDANCE}`;
             )}
             {currentPhase === 3 && (
               <div className="space-y-6">
-                <ConclusionWriter />
-                <BiasTestingTool onSendMessage={handleSendMessage} />
+                {!showingSurvey ? (
+                  <>
+                    <ConclusionWriter
+                      onShowSurvey={() => {
+                        setMessages(prev => [...prev, {
+                          role: "assistant",
+                          content: "Thank you for saving your conclusion. You can continue working on it, or finish by taking an optional feedback survey."
+                        }]);
+                        setTimeout(scrollToBottom, 100);
+                      }}
+                    />
+                    <BiasTestingTool onSendMessage={handleSendMessage} />
+                  </>
+                ) : (
+                  <Survey />
+                )}
               </div>
             )}
           </PhaseContent>
