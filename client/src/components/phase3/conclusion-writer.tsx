@@ -9,7 +9,6 @@ const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
   const [conclusion, setConclusion] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
-  const [showSurvey, setShowSurvey] = useState(false);
 
   const handleSaveConclusion = async () => {
     if (!conclusion.trim()) {
@@ -192,12 +191,7 @@ It is important because..."
                 </>
               )}
             </button>
-            {isSaved && <button
-              onClick={() => setShowSurvey(true)}
-              className="ml-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
-            >
-              Continue to Survey
-            </button>}
+            
           </div>
         </div>
       </div>
