@@ -437,10 +437,6 @@ ${ENGAGEMENT_GUIDANCE}`;
                   <>
                     <ConclusionWriter
                       onShowSurvey={() => {
-                        setMessages(prev => [...prev, {
-                          role: "assistant",
-                          content: "Thank you for saving your conclusion. You can continue working on it, or finish by taking an optional feedback survey."
-                        }]);
                         const message = {
                           role: "assistant",
                           content: "Thank you for saving your conclusion. You can continue working on it, or click the button below to finish and take an optional feedback survey.",
