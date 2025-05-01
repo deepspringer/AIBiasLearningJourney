@@ -15,7 +15,11 @@ const questions: SurveyQuestion[] = [
   { id: "conclusionChat", text: "Overall, how valuable was the AI chat about the conclusion writing to you?" }
 ];
 
-const Survey = () => {
+interface SurveyProps {
+  onPhaseChange: (phase: 1 | 2 | 3) => void;
+}
+
+const Survey = ({ onPhaseChange }: SurveyProps) => {
   const [responses, setResponses] = useState<Record<string, number>>({});
   const [valuable, setValuable] = useState("");
   const [improvements, setImprovements] = useState("");
@@ -60,6 +64,7 @@ const Survey = () => {
       const data = await response.json();
       console.log('Survey saved:', data);
       alert("Thank you for your feedback!");
+      onPhaseChange(2); // Return to phase 2
     } catch (error) {
       console.error("Error submitting survey:", error);
       alert("Error submitting survey. Please try again.");

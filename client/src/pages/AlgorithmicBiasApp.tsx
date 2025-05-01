@@ -453,7 +453,7 @@ ${ENGAGEMENT_GUIDANCE}`;
                     <BiasTestingTool onSendMessage={handleSendMessage} />
                   </>
                 ) : (
-                  <Survey />
+                  <Survey onPhaseChange={setCurrentPhase} />
                 )}
               </div>
             )}
