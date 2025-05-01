@@ -32,7 +32,9 @@ const Survey = ({ onPhaseChange }: SurveyProps) => {
   const handleSubmit = async () => {
     setIsSubmitting(true);
     try {
+      console.log("[Survey] Starting survey submission...");
       const userId = localStorage.getItem('userId');
+      console.log("[Survey] User ID:", userId);
       let surveyContent = "Survey Results:\n\n";
       
       // Add numeric responses
@@ -46,10 +48,18 @@ const Survey = ({ onPhaseChange }: SurveyProps) => {
       surveyContent += `What was valuable:\n${valuable || "No response"}\n\n`;
       surveyContent += `What could be improved:\n${improvements || "No response"}`;
 
+      const payload = {
+        userId,
+        role: "user",
+        content: surveyContent,
+        phase: 3
+      };
+      console.log("[Survey] Sending payload:", payload);
+      
       const response = await fetch("/api/save-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
+        body: JSON.stringify(payload),
           userId,
           role: "user",
           content: surveyContent,

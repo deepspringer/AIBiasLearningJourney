@@ -52,13 +52,19 @@ export async function handleChat(req: Request, res: Response) {
     }
 
     // Store the user's message in the database
-    await storage.saveMessage({
-      userId,
-      role: "user",
-      content: userMessage,
-      phase,
-      paragraph,
-    });
+    try {
+      console.log("[Server] Received message payload:", req.body);
+      await storage.saveMessage({
+        userId,
+        role: "user",
+        content: userMessage,
+        phase,
+        paragraph,
+      });
+    } catch (saveMessageError) {
+      console.error("[Server] Error saving message:", saveMessageError);
+      throw saveMessageError;
+    }
 
     // Convert chat history to OpenAI format
     const messages = [
@@ -193,15 +199,17 @@ export async function handleSaveConclusion(req: Request, res: Response) {
       console.log("[Server] No userId provided in request");
       return res.status(400).json({ error: "User ID is required" });
     }
-    
+
     const userId = parseInt(requestUserId, 10);
     console.log("[Server] Parsed userId:", userId);
 
     console.log("[Server] Saving conclusion with userId:", userId);
+    console.log("[Server] Conclusion payload:", { userId, content: conclusion }); // Added logging
     const savedConclusion = await storage.saveConclusion({
       userId,
       content: conclusion,
     });
+    console.log("[Server] Conclusion saved successfully:", savedConclusion); //Added logging
 
     res.json({ success: true, id: savedConclusion.id });
   } catch (error) {
