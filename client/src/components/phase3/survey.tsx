@@ -42,7 +42,7 @@ const Survey = () => {
       surveyContent += `What was valuable:\n${valuable || "No response"}\n\n`;
       surveyContent += `What could be improved:\n${improvements || "No response"}`;
 
-      await fetch("/api/save-message", {
+      const response = const response = await fetch("/api/save-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -53,6 +53,12 @@ const Survey = () => {
         })
       });
 
+      if (!response.ok) {
+        throw new Error('Failed to save survey results');
+      }
+
+      const data = await response.json();
+      console.log('Survey saved:', data);
       alert("Thank you for your feedback!");
     } catch (error) {
       console.error("Error submitting survey:", error);
