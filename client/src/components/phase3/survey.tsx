@@ -17,9 +17,49 @@ const questions: SurveyQuestion[] = [
 
 const Survey = () => {
   const [responses, setResponses] = useState<Record<string, number>>({});
+  const [valuable, setValuable] = useState("");
+  const [improvements, setImprovements] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleSliderChange = (questionId: string, value: number) => {
     setResponses(prev => ({ ...prev, [questionId]: value }));
+  };
+
+  const handleSubmit = async () => {
+    setIsSubmitting(true);
+    try {
+      const userId = localStorage.getItem('userId');
+      let surveyContent = "Survey Results:\n\n";
+      
+      // Add numeric responses
+      questions.forEach(q => {
+        const value = responses[q.id] || 3;
+        const valueText = ["Not at all", "A little", "A moderate amount", "A lot", "A great deal"][value - 1];
+        surveyContent += `${q.text}\nResponse: ${valueText} (${value}/5)\n\n`;
+      });
+      
+      // Add text responses
+      surveyContent += `What was valuable:\n${valuable || "No response"}\n\n`;
+      surveyContent += `What could be improved:\n${improvements || "No response"}`;
+
+      await fetch("/api/save-message", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          userId,
+          role: "user",
+          content: surveyContent,
+          phase: 3
+        })
+      });
+
+      alert("Thank you for your feedback!");
+    } catch (error) {
+      console.error("Error submitting survey:", error);
+      alert("Error submitting survey. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -48,6 +88,36 @@ const Survey = () => {
           </div>
         </div>
       ))}
+      
+      <div className="space-y-4">
+        <div>
+          <label className="block text-gray-700 mb-2">What did you find valuable about the app?</label>
+          <textarea
+            value={valuable}
+            onChange={(e) => setValuable(e.target.value)}
+            className="w-full h-32 p-2 border rounded-md"
+          />
+        </div>
+        
+        <div>
+          <label className="block text-gray-700 mb-2">What could be improved?</label>
+          <textarea
+            value={improvements}
+            onChange={(e) => setImprovements(e.target.value)}
+            className="w-full h-32 p-2 border rounded-md"
+          />
+        </div>
+      </div>
+
+      <button
+        onClick={handleSubmit}
+        disabled={isSubmitting}
+        className={`px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 ${
+          isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+        }`}
+      >
+        {isSubmitting ? "Submitting..." : "Submit Survey"}
+      </button>
     </div>
   );
 };
