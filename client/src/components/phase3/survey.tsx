@@ -59,22 +59,17 @@ const Survey = ({ onPhaseChange }: SurveyProps) => {
       const response = await fetch("/api/save-message", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-          userId,
-          role: "user",
-          content: surveyContent,
-          phase: 3
-        })
+        body: JSON.stringify(payload)
       });
 
       if (!response.ok) {
-        throw new Error('Failed to save survey results');
+        const errorText = await response.text();
+        throw new Error(`Failed to save survey: ${errorText}`);
       }
 
-      const data = await response.json();
-      console.log('Survey saved:', data);
+      console.log('Survey saved successfully');
       alert("Thank you for your feedback!");
-      onPhaseChange(2); // Return to phase 2
+      onPhaseChange(2);
     } catch (error) {
       console.error("Error submitting survey:", error);
       alert("Error submitting survey. Please try again.");
