@@ -12,9 +12,10 @@ interface ChatPanelProps {
   onFloatingActionClick?: () => void;
   isLastParagraph?: boolean;
   messageCount?: number;
+  onConclusionSave?: () => void; // Added for conclusion saving
 }
 
-const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph, currentPhase, isEngaged, messageCount = 0 }: ChatPanelProps) => {
+const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph, currentPhase, isEngaged, messageCount = 0, onConclusionSave }: ChatPanelProps) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
@@ -24,8 +25,13 @@ const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, 
   };
 
   useEffect(() => {
-    scrollToBottom();
-  }, [messages]);
+    if (onConclusionSave) { // Only scroll if onConclusionSave is provided.
+        onConclusionSave()
+        .then(() => scrollToBottom());
+    } else {
+        scrollToBottom();
+    }
+  }, [messages, onConclusionSave]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -128,6 +134,28 @@ const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, 
               </div>
             </div>
           </div>
+        )}
+
+        {currentPhase === 3 && messages.some(m => m.content.includes("take an optional feedback survey")) && (
+          <button
+            onClick={onConclusionSave} // Assuming onConclusionSave handles survey and scroll
+            className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center"
+          >
+            <span className="mr-2">Finish</span>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="m12 5 7 7-7 7"></path>
+            </svg>
+          </button>
         )}
 
         <div ref={messagesEndRef} />

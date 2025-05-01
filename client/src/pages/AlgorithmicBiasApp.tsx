@@ -7,6 +7,7 @@ import PhaseContent from "@/components/ui/phase-content";
 import TextReader from "@/components/phase1/text-reader";
 import BiasTestingTool from "@/components/phase2/bias-testing-tool";
 import ConclusionWriter from "@/components/phase3/conclusion-writer";
+import Survey from "@/components/phase3/survey";
 import { ENGAGEMENT_GUIDANCE } from "@/constants/prompts";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -440,7 +441,12 @@ ${ENGAGEMENT_GUIDANCE}`;
                           role: "assistant",
                           content: "Thank you for saving your conclusion. You can continue working on it, or finish by taking an optional feedback survey."
                         }]);
-                        setTimeout(scrollToBottom, 100);
+                        const message = {
+                          role: "assistant",
+                          content: "Thank you for saving your conclusion. You can continue working on it, or click the button below to finish and take an optional feedback survey.",
+                        };
+                        setMessages(prev => [...prev, message]);
+                        scrollToBottom();
                       }}
                     />
                     <BiasTestingTool onSendMessage={handleSendMessage} />
