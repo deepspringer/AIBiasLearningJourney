@@ -338,6 +338,18 @@ ${ENGAGEMENT_GUIDANCE}`;
     }));
   };
 
+  const handleFloatingActionClick = () => {
+    if (currentPhase === 1) {
+      if (currentParagraph === ALGORITHMIC_BIAS_TEXT.length) {
+        setCurrentPhase(2);
+      } else {
+        handleParagraphChange(currentParagraph + 1);
+      }
+    } else if (currentPhase === 2 && phase2Messages.length >= 10) {
+      setCurrentPhase(3);
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800">
       {/* Header */}
@@ -403,20 +415,9 @@ ${ENGAGEMENT_GUIDANCE}`;
             currentPhase={currentPhase}
             isEngaged={paragraphEngagement[currentParagraph] || false}
             messageCount={paragraphMessageCounts[currentParagraph] || 0}
-            onFloatingActionClick={
-              currentPhase === 1
-                ? () => {
-                    if (currentParagraph === ALGORITHMIC_BIAS_TEXT.length) {
-                      setCurrentPhase(2);
-                    } else {
-                      handleParagraphChange(currentParagraph + 1);
-                    }
-                  }
-                : currentPhase === 2 && phase2Messages.length >= 10
-                  ? () => setCurrentPhase(3)
-                  : undefined
-            }
+            onFloatingActionClick={handleFloatingActionClick}
             isLastParagraph={currentParagraph === ALGORITHMIC_BIAS_TEXT.length}
+            onFinish={() => setShowingSurvey(true)}
           />
 
           {/* Content Panel */}

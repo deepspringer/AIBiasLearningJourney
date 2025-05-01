@@ -138,7 +138,7 @@ const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, 
 
         {currentPhase === 3 && messages.some(m => m.content.includes("take an optional feedback survey")) && (
           <button
-            onClick={onConclusionSave} // Assuming onConclusionSave handles survey and scroll
+            onClick={() => onFinish?.()}
             className="mt-4 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 flex items-center"
           >
             <span className="mr-2">Finish</span>
