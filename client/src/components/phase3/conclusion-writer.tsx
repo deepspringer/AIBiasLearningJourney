@@ -187,7 +187,15 @@ It is important because..."
                 </>
               )}
             </button>
-            {isSaved && onShowSurvey()}
+            {isSaved && <button
+              onClick={() => {
+                onShowSurvey();
+                setShowSurvey(true);
+              }}
+              className="ml-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
+            >
+              Continue to Survey
+            </button>}
           </div>
         </div>
       </div>
