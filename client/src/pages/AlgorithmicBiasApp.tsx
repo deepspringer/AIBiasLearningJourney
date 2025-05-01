@@ -417,7 +417,11 @@ ${ENGAGEMENT_GUIDANCE}`;
             messageCount={paragraphMessageCounts[currentParagraph] || 0}
             onFloatingActionClick={handleFloatingActionClick}
             isLastParagraph={currentParagraph === ALGORITHMIC_BIAS_TEXT.length}
-            onFinish={() => setShowingSurvey(true)}
+            onFinish={() => {
+              console.log("[AlgorithmicBiasApp] Setting showingSurvey to true");
+              setShowingSurvey(true);
+              console.log("[AlgorithmicBiasApp] Current phase:", currentPhase);
+            }}
           />
 
           {/* Content Panel */}
