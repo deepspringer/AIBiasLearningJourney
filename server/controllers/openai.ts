@@ -54,13 +54,22 @@ export async function handleChat(req: Request, res: Response) {
     // Store the user's message in the database
     try {
       console.log("[Server] Received message payload:", req.body);
-      await storage.saveMessage({
-        userId,
+      const parsedUserId = parseInt(userId.toString(), 10);
+      if (isNaN(parsedUserId)) {
+        throw new Error("Invalid user ID");
+      }
+      
+      const messageToSave = {
+        userId: parsedUserId,
         role: "user",
         content: userMessage,
         phase,
         paragraph,
-      });
+      };
+      
+      console.log("[Server] Saving message:", messageToSave);
+      const savedMessage = await storage.saveMessage(messageToSave);
+      console.log("[Server] Message saved successfully:", savedMessage);
     } catch (saveMessageError) {
       console.error("[Server] Error saving message:", saveMessageError);
       throw saveMessageError;
