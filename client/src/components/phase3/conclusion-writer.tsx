@@ -4,6 +4,30 @@ const ConclusionWriter = () => {
   const [conclusion, setConclusion] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+  const [isComplete, setIsComplete] = useState(false);
+  const [validationFeedback, setValidationFeedback] = useState("");
+
+  const validateConclusion = async () => {
+    try {
+      const response = await fetch("/api/validate-conclusion", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ conclusion }),
+      });
+
+      if (!response.ok) throw new Error("Failed to validate");
+      
+      const data = await response.json();
+      setIsComplete(data.complete);
+      setValidationFeedback(data.feedback);
+      return data.complete;
+    } catch (error) {
+      console.error("Error validating conclusion:", error);
+      return false;
+    }
+  };
 
   const handleSaveConclusion = async () => {
     if (!conclusion.trim()) {
@@ -34,6 +58,7 @@ const ConclusionWriter = () => {
 
       setIsSaved(true);
       setTimeout(() => setIsSaved(false), 2000);
+      await validateConclusion();
     } catch (error) {
       console.error("Error saving conclusion:", error);
       alert("Error saving conclusion. Please try again.");
@@ -180,8 +205,27 @@ It is important because..."
               )}
             </button>
           </div>
+          {validationFeedback && (
+            <div className={`mt-4 p-4 rounded-md ${isComplete ? 'bg-green-50 text-green-800' : 'bg-yellow-50 text-yellow-800'}`}>
+              {validationFeedback}
+            </div>
+          )}
         </div>
       </div>
+      {isComplete && (
+        <div className="fixed bottom-8 right-8">
+          <button
+            onClick={() => window.location.href = "/finish"}
+            className="px-6 py-3 bg-green-600 text-white rounded-full shadow-lg hover:bg-green-700 transition-colors flex items-center space-x-2"
+          >
+            <span>Finish</span>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 12h14"/>
+              <path d="m12 5 7 7-7 7"/>
+            </svg>
+          </button>
+        </div>
+      )}
     </div>
   );
 };
