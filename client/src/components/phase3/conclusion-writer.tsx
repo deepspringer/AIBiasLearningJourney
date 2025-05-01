@@ -115,7 +115,12 @@ It is important because..."
 
           <div className="flex justify-end">
             <button
-              onClick={handleSaveConclusion}
+              onClick={async () => {
+                await handleSaveConclusion();
+                if (!showSurvey) {
+                  onShowSurvey();
+                }
+              }}
               disabled={isSaving}
               className={`px-4 py-2 ${isSaved ? "bg-green-700" : "bg-green-500"} text-white rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50 flex items-center ${
                 isSaving ? "opacity-50 cursor-not-allowed" : ""
@@ -188,10 +193,7 @@ It is important because..."
               )}
             </button>
             {isSaved && <button
-              onClick={() => {
-                onShowSurvey();
-                setShowSurvey(true);
-              }}
+              onClick={() => setShowSurvey(true)}
               className="ml-2 px-4 py-2 bg-primary text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-opacity-50"
             >
               Continue to Survey
