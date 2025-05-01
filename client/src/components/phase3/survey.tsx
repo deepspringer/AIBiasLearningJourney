@@ -58,6 +58,11 @@ const Survey = ({ onPhaseChange }: SurveyProps) => {
       });
 
       if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to save survey: ${errorText}`);
+      }
+
+      if (!response.ok) {
         throw new Error('Failed to save survey results');
       }
 
