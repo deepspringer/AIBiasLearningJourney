@@ -48,19 +48,26 @@ const Survey = ({ onPhaseChange }: SurveyProps) => {
       surveyContent += `What was valuable:\n${valuable || "No response"}\n\n`;
       surveyContent += `What could be improved:\n${improvements || "No response"}`;
 
+      // Build the complete request body as expected by the server
       const payload = {
-        userId,
-        role: "user",
-        content: surveyContent,
-        phase: 3
+        systemPrompt: "",
+        userMessage: surveyContent,
+        phase: 3,
+        chatHistory: [],
+        userId
       };
+      
       console.log("[Survey] Sending payload:", payload);
       
-      const response = await fetch("/api/save-message", {
+      const response = await fetch("/api/chat", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload)
       });
+
+      console.log("[Survey] Response status:", response.status);
+      const responseData = await response.text();
+      console.log("[Survey] Response data:", responseData);
 
       if (!response.ok) {
         const errorText = await response.text();
