@@ -13,6 +13,7 @@ interface ChatPanelProps {
   isLastParagraph?: boolean;
   messageCount?: number;
   onConclusionSave?: () => void; // Added for conclusion saving
+  onFinish?: () => void; // Added for handling finish action
 }
 
 const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph, currentPhase, isEngaged, messageCount = 0, onConclusionSave }: ChatPanelProps) => {
