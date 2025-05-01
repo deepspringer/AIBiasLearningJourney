@@ -16,7 +16,7 @@ interface ChatPanelProps {
   onFinish?: () => void; // Added for handling finish action
 }
 
-const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph, currentPhase, isEngaged, messageCount = 0, onConclusionSave }: ChatPanelProps) => {
+const ChatPanel = ({ messages, onSendMessage, isLoading, onFloatingActionClick, isLastParagraph, currentPhase, isEngaged, messageCount = 0, onConclusionSave, onFinish }: ChatPanelProps) => {
   const [input, setInput] = useState("");
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const chatMessagesRef = useRef<HTMLDivElement>(null);
