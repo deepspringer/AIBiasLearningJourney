@@ -52,18 +52,13 @@ export async function handleChat(req: Request, res: Response) {
     }
 
     // Store the user's message in the database
-    try {
-      await storage.saveMessage({
-        userId,
-        role: "user",
-        content: userMessage,
-        phase,
-        paragraph,
-      });
-    } catch (error) {
-      console.error("Error saving message:", error);
-      return res.status(500).json({ error: "Failed to save message" });
-    }
+    await storage.saveMessage({
+      userId,
+      role: "user",
+      content: userMessage,
+      phase,
+      paragraph,
+    });
 
     // Convert chat history to OpenAI format
     const messages = [
