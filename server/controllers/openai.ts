@@ -70,6 +70,11 @@ export async function handleChat(req: Request, res: Response) {
       console.log("[Server] Saving message:", messageToSave);
       const savedMessage = await storage.saveMessage(messageToSave);
       console.log("[Server] Message saved successfully:", savedMessage);
+
+      // If this is a survey submission, just save it without generating an AI response
+      if (phase === 3 && userMessage.startsWith('Survey Results:')) {
+        return res.json({ message: "" });
+      }
     } catch (saveMessageError) {
       console.error("[Server] Error saving message:", saveMessageError);
       throw saveMessageError;
