@@ -433,8 +433,11 @@ ${ENGAGEMENT_GUIDANCE}`;
                 paragraphMessageCounts={paragraphMessageCounts} // Pass message counts to TextReader
               />
             )}
-            {currentPhase === 2 && (
-              <BiasTestingTool onSendMessage={handleSendMessage} />
+            {(currentPhase === 2 || (currentPhase === 3 && !showingSurvey)) && (
+              <BiasTestingTool 
+                onSendMessage={handleSendMessage}
+                key="bias-tool" // Prevent remounting
+              />
             )}
             {currentPhase === 3 && (
               <div className="space-y-6">
@@ -450,7 +453,6 @@ ${ENGAGEMENT_GUIDANCE}`;
                         scrollToBottom();
                       }}
                     />
-                    <BiasTestingTool onSendMessage={handleSendMessage} />
                   </>
                 ) : (
                   <Survey onPhaseChange={setCurrentPhase} />
