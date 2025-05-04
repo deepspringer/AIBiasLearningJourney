@@ -41,6 +41,16 @@ async function main() {
         result TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT NOW()
       );
+
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER REFERENCES users(id) NOT NULL,
+        role TEXT NOT NULL,
+        content TEXT NOT NULL,
+        phase INTEGER NOT NULL,
+        paragraph INTEGER,
+        created_at TIMESTAMP DEFAULT NOW()
+      );
     `);
     
     console.log("Database schema migrated successfully");
