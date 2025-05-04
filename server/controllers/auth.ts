@@ -1,25 +1,18 @@
+
 import { Request, Response } from "express";
-import { v4 as uuidv4 } from "uuid";
+import bcrypt from "bcryptjs";
 import { storage } from "../storage";
 import { insertUserSchema } from "../../shared/schema";
 
-interface LoginRequestBody {
-  displayName: string;
+declare module 'express-session' {
+  interface SessionData {
+    userId: number;
+  }
 }
 
-/**
- * Handle user login/registration
- * This is a simplified auth flow that only requires a display name
- */
 export async function handleLogin(req: Request, res: Response) {
   try {
-    const { displayName, username, password } = req.body as LoginRequestBody;
-
-    if (!displayName || displayName.trim().length < 2) {
-      return res.status(400).json({
-        error: "Display name must be at least 2 characters",
-      });
-    }
+    const { username, password } = req.body;
 
     if (!username || username.trim().length < 3) {
       return res.status(400).json({
@@ -34,37 +27,60 @@ export async function handleLogin(req: Request, res: Response) {
     }
 
     // Find user
-    let user = await storage.getUserByUsername(username);
+    const user = await storage.getUserByUsername(username);
 
     if (user) {
       // Verify password
-      if (user.password !== password) { // In a real app, use proper password hashing
+      const isValid = await bcrypt.compare(password, user.password);
+      if (!isValid) {
         return res.status(401).json({
-          error: "Invalid password",
+          error: "Invalid credentials",
         });
       }
+
+      // Set session
+      req.session.userId = user.id;
+
+      return res.status(200).json({
+        id: user.id,
+        username: user.username,
+        displayName: user.displayName,
+        role: user.role
+      });
     } else {
-      // Create new user
+      // Create new user with hashed password
+      const hashedPassword = await bcrypt.hash(password, 10);
       const userData = insertUserSchema.parse({
         username,
-        displayName,
-        password,
-        role: "student", // Default role
+        displayName: username,
+        password: hashedPassword,
+        role: "student"
       });
 
-      user = await storage.createUser(userData);
-    }
+      const newUser = await storage.createUser(userData);
+      req.session.userId = newUser.id;
 
-    // Return user info
-    return res.status(200).json({
-      id: user.id,
-      username: user.username,
-      displayName: user.displayName,
-    });
+      return res.status(200).json({
+        id: newUser.id,
+        username: newUser.username,
+        displayName: newUser.displayName,
+        role: newUser.role
+      });
+    }
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({
       error: "An error occurred during login",
     });
   }
+}
+
+export async function handleLogout(req: Request, res: Response) {
+  req.session.destroy((err) => {
+    if (err) {
+      return res.status(500).json({ error: "Failed to logout" });
+    }
+    res.clearCookie("connect.sid");
+    res.status(200).json({ message: "Logged out successfully" });
+  });
 }
