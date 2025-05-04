@@ -14,6 +14,12 @@ const loginSchema = z.object({
   displayName: z.string().min(2, {
     message: "Display name must be at least 2 characters.",
   }),
+  username: z.string().min(3, {
+    message: "Username must be at least 3 characters.",
+  }),
+  password: z.string().min(6, {
+    message: "Password must be at least 6 characters.",
+  }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -27,6 +33,8 @@ export default function LoginPage() {
     resolver: zodResolver(loginSchema),
     defaultValues: {
       displayName: "",
+      username: "",
+      password: "",
     },
   });
 
@@ -41,6 +49,8 @@ export default function LoginPage() {
         },
         body: JSON.stringify({
           displayName: data.displayName,
+          username: data.username,
+          password: data.password,
         }),
       });
       
@@ -96,6 +106,32 @@ export default function LoginPage() {
                     <FormLabel>Your Name</FormLabel>
                     <FormControl>
                       <Input placeholder="Enter your name" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="username"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Username</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Enter username" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="password"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Password</FormLabel>
+                    <FormControl>
+                      <Input type="password" placeholder="Enter password" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

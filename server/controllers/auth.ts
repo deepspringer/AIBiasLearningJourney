@@ -13,7 +13,7 @@ interface LoginRequestBody {
  */
 export async function handleLogin(req: Request, res: Response) {
   try {
-    const { displayName } = req.body as LoginRequestBody;
+    const { displayName, username, password } = req.body as LoginRequestBody;
 
     if (!displayName || displayName.trim().length < 2) {
       return res.status(400).json({
@@ -21,17 +21,35 @@ export async function handleLogin(req: Request, res: Response) {
       });
     }
 
-    // Generate a username based on display name (for uniqueness)
-    const username = `${displayName.toLowerCase().replace(/\s+/g, "_")}_${uuidv4().substring(0, 8)}`;
+    if (!username || username.trim().length < 3) {
+      return res.status(400).json({
+        error: "Username must be at least 3 characters",
+      });
+    }
 
-    // Find or create user
+    if (!password || password.trim().length < 6) {
+      return res.status(400).json({
+        error: "Password must be at least 6 characters",
+      });
+    }
+
+    // Find user
     let user = await storage.getUserByUsername(username);
 
-    if (!user) {
+    if (user) {
+      // Verify password
+      if (user.password !== password) { // In a real app, use proper password hashing
+        return res.status(401).json({
+          error: "Invalid password",
+        });
+      }
+    } else {
       // Create new user
       const userData = insertUserSchema.parse({
         username,
         displayName,
+        password,
+        role: "student", // Default role
       });
 
       user = await storage.createUser(userData);
