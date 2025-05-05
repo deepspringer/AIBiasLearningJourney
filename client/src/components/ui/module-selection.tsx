@@ -18,12 +18,13 @@ const isAdmin = () => {
 };
 
 export default function ModuleSelection({ onModuleSelect }: ModuleSelectionProps) {
-  console.log("[2] ModuleSelection component mounting");
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
+  
+  const adminStatus = isAdmin();
+  console.log("Admin status check:", adminStatus, "Role from localStorage:", localStorage.getItem("roles"));
 
   useEffect(() => {
-    console.log("[3] Fetching modules from API");
     fetch('/api/modules')
       .then(res => res.json())
       .then(data => {
