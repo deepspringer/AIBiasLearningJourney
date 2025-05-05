@@ -105,6 +105,11 @@ export class DatabaseStorage implements IStorage {
     return result;
   }
 
+  async getModule(id: number): Promise<any> {
+    const [module] = await db.select().from(modules).where(eq(modules.id, id));
+    return module;
+  }
+
   async createModule(moduleData: any): Promise<any> {
     console.log("Creating module with data:", moduleData);
     const result = await db.insert(modules).values({
