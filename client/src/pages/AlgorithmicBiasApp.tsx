@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
+import ModuleSelection from "@/components/ui/module-selection";
 import { ALGORITHMIC_BIAS_TEXT } from "@/constants/text-content";
 import PhaseNavigation from "@/components/ui/phase-navigation";
 import ChatPanel from "@/components/ui/chat-panel";
