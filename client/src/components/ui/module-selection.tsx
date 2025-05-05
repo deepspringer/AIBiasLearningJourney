@@ -12,6 +12,11 @@ interface ModuleSelectionProps {
   onModuleSelect: (moduleId: number) => void;
 }
 
+const isAdmin = () => {
+  const roles = localStorage.getItem("roles");
+  return roles?.includes("admin") || false;
+};
+
 export default function ModuleSelection({ onModuleSelect }: ModuleSelectionProps) {
   console.log("[2] ModuleSelection component mounting");
   const [modules, setModules] = useState<Module[]>([]);
@@ -39,6 +44,24 @@ export default function ModuleSelection({ onModuleSelect }: ModuleSelectionProps
     <div className="container mx-auto px-4 py-8">
       <h1 className="text-3xl font-bold text-center mb-8">Select a Module</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {isAdmin() && (
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow border-dashed border-2"
+            onClick={() => window.location.href = "/add-module"}
+          >
+            <CardHeader>
+              <CardTitle>Add New Module</CardTitle>
+              <CardDescription>Create a new learning module</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <button 
+                className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 w-full"
+              >
+                Create Module
+              </button>
+            </CardContent>
+          </Card>
+        )}
         {modules.map((module) => (
           <Card 
             key={module.id} 
