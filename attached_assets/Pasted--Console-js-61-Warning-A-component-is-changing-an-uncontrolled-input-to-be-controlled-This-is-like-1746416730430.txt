@@ -1,0 +1,28 @@
+
+Console.js:61 Warning: A component is changing an uncontrolled input to be controlled. This is likely caused by the value changing from undefined to a defined value, which should not happen. Decide between using a controlled or uncontrolled input element for the lifetime of the component. More info: https://reactjs.org/link/controlled-components
+    at input
+    at _c (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.replit.dev/src/components/ui/input.tsx:20:11)
+    at https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-EVLBUYTV.js?v=f5fc7ca4:79:13
+    at https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-EVLBUYTV.js?v=f5fc7ca4:56:13
+    at https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.replit.dev/src/components/ui/form.tsx:130:9
+    at div
+    at https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.replit.dev/src/components/ui/form.tsx:72:6
+    at Controller (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…nner/workspace/node_modules/.vite/deps/chunk-4BFJKWC4.js?v=f5fc7ca4:298:35)
+    at FormField (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.replit.dev/src/components/ui/form.tsx:33:6)
+    at form
+    at FormProvider (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…nner/workspace/node_modules/.vite/deps/chunk-4BFJKWC4.js?v=f5fc7ca4:102:11)
+    at div
+    at _c9 (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.replit.dev/src/components/ui/card.tsx:114:12)
+    at div
+    at _c (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.replit.dev/src/components/ui/card.tsx:20:11)
+    at div
+    at AddModulePage (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.replit.dev/src/pages/AddModulePage.tsx:41:43)
+    at Route (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=f5fc7ca4:323:16)
+    at Switch (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…/home/runner/workspace/node_modules/.vite/deps/wouter.js?v=f5fc7ca4:379:17)
+    at Router (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.replit.dev/src/App.tsx?v=5yQi37SrMKkllfrwjveda:31:49)
+    at Provider (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…unner/workspace/node_modules/.vite/deps/chunk-GF6MDVSF.js?v=f5fc7ca4:42:15)
+    at TooltipProvider (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…space/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=f5fc7ca4:2251:5)
+    at QueryClientProvider (https://a1e86f1c-dca4-416a-a707-ad8975d3f8c1-00-2ooilmxywqjoz.janeway.repli…rkspace/node_modules/.vite/deps/@tanstack_react-query.js?v=f5fc7ca4:2805:3)
+    at App
+﻿
+
