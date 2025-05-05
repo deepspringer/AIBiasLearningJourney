@@ -23,9 +23,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
   // Engagement check endpoint
   app.post("/api/check-engagement", handleEngagementCheck);
 
-  // Get modules endpoint
+  // Module endpoints
+  app.post("/api/modules", async (req, res) => {
+    console.log("[4] API /modules POST endpoint called", req.body);
+    try {
+      const newModule = await storage.createModule(req.body);
+      res.json(newModule);
+    } catch (error) {
+      console.error('Error creating module:', error);
+      res.status(500).json({ error: 'Failed to create module' });
+    }
+  });
+
   app.get("/api/modules", async (req, res) => {
-    console.log("[4] API /modules endpoint called");
+    console.log("[4] API /modules GET endpoint called");
     try {
       const modules = await storage.getModules();
       res.json(modules);

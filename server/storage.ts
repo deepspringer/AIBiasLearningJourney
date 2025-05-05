@@ -2,7 +2,8 @@ import {
   users, type User, type InsertUser, 
   conclusions, type Conclusion, type InsertConclusion, 
   biasTestResults, type BiasTestResult, type InsertBiasTestResult,
-  messages, type Message, type InsertMessage
+  messages, type Message, type InsertMessage,
+  modules, type Module, type InsertModule
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -25,6 +26,7 @@ export interface IStorage {
   saveMessage(message: InsertMessage): Promise<Message>;
   getMessagesByUserId(userId: number, phase: number): Promise<Message[]>;
   getModules(): Promise<any[]>;
+  createModule(moduleData: any): Promise<any>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -98,8 +100,25 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getModules(): Promise<any[]> {
-    const { rows } = await db.execute('SELECT id, name, description FROM modules');
-    return rows;
+    const result = await db.select().from(modules);
+    console.log("Retrieved modules:", result);
+    return result;
+  }
+
+  async createModule(moduleData: any): Promise<any> {
+    console.log("Creating module with data:", moduleData);
+    const result = await db.insert(modules).values({
+      name: moduleData.name,
+      description: moduleData.description,
+      text: moduleData.text,
+      systemPromptRead: moduleData.system_prompt_read,
+      experimentHtml: moduleData.experiment_html,
+      systemPromptExperiment: moduleData.system_prompt_experiment,
+      concludeText: moduleData.conclude_text,
+      systemPromptConclude: moduleData.system_prompt_conclude,
+    }).returning();
+    console.log("Created module:", result);
+    return result[0];
   }
 }
 
