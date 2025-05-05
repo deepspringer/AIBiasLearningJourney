@@ -21,7 +21,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/save-conclusion", handleSaveConclusion);
 
   // Engagement check endpoint
-  app.post("/api/check-engagement", handleEngagementCheck); // Added route
+  app.post("/api/check-engagement", handleEngagementCheck);
+  
+  // Get modules endpoint
+  app.get("/api/modules", async (req, res) => {
+    try {
+      const modules = await storage.getModules();
+      res.json(modules);
+    } catch (error) {
+      console.error('Error fetching modules:', error);
+      res.status(500).json({ error: 'Failed to fetch modules' });
+    }
+  });
 
   const httpServer = createServer(app);
 

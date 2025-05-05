@@ -12,18 +12,19 @@ export interface IStorage {
   getUser(id: number): Promise<User | undefined>;
   getUserByUsername(username: string): Promise<User | undefined>;
   createUser(user: InsertUser): Promise<User>;
-  
+
   // Conclusion operations
   saveConclusion(conclusion: InsertConclusion): Promise<Conclusion>;
   getConclusionByUserId(userId: number): Promise<Conclusion | undefined>;
-  
+
   // Bias test results operations
   saveBiasTestResult(result: InsertBiasTestResult): Promise<BiasTestResult>;
   getBiasTestResultsByUserId(userId: number): Promise<BiasTestResult[]>;
-  
+
   // Message operations
   saveMessage(message: InsertMessage): Promise<Message>;
   getMessagesByUserId(userId: number, phase: number): Promise<Message[]>;
+  getModules(): Promise<any[]>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -44,7 +45,7 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return user;
   }
-  
+
   async saveConclusion(conclusion: InsertConclusion): Promise<Conclusion> {
     console.log("[Storage] Attempting to save conclusion with userId:", conclusion.userId);
     const [savedConclusion] = await db
@@ -54,7 +55,7 @@ export class DatabaseStorage implements IStorage {
     console.log("[Storage] Saved conclusion:", savedConclusion);
     return savedConclusion;
   }
-  
+
   async getConclusionByUserId(userId: number): Promise<Conclusion | undefined> {
     const [conclusion] = await db
       .select()
@@ -63,7 +64,7 @@ export class DatabaseStorage implements IStorage {
       .orderBy(conclusions.createdAt);
     return conclusion || undefined;
   }
-  
+
   async saveBiasTestResult(result: InsertBiasTestResult): Promise<BiasTestResult> {
     const [savedResult] = await db
       .insert(biasTestResults)
@@ -71,14 +72,14 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return savedResult;
   }
-  
+
   async getBiasTestResultsByUserId(userId: number): Promise<BiasTestResult[]> {
     return db
       .select()
       .from(biasTestResults)
       .where(eq(biasTestResults.userId, userId));
   }
-  
+
   async saveMessage(message: InsertMessage): Promise<Message> {
     console.log("[Storage] Saving message:", message);
     const [savedMessage] = await db
@@ -87,7 +88,7 @@ export class DatabaseStorage implements IStorage {
       .returning();
     return savedMessage;
   }
-  
+
   async getMessagesByUserId(userId: number, phase: number): Promise<Message[]> {
     return db
       .select()
@@ -96,20 +97,9 @@ export class DatabaseStorage implements IStorage {
       .orderBy(messages.createdAt as any);  // Type assertion to bypass ordering issue
   }
 
-  async saveEngagementScore(score: InsertEngagementScore): Promise<EngagementScore> {
-    const [savedScore] = await db
-      .insert(engagementScores)
-      .values(score)
-      .returning();
-    return savedScore;
-  }
-
-  async getEngagementScores(userId: number): Promise<EngagementScore[]> {
-    return db
-      .select()
-      .from(engagementScores)
-      .where(eq(engagementScores.userId, userId))
-      .orderBy(engagementScores.createdAt as any);
+  async getModules(): Promise<any[]> {
+    const { rows } = await db.execute('SELECT id, name, description FROM modules');
+    return rows;
   }
 }
 

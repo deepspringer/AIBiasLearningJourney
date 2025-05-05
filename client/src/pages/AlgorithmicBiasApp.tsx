@@ -21,6 +21,7 @@ export type Message = {
 const AlgorithmicBiasApp = () => {
   const [currentPhase, setCurrentPhase] = useState<Phase>(1);
   const [showingSurvey, setShowingSurvey] = useState(false);
+  const [selectedModule, setSelectedModule] = useState<number | null>(null);
 
   const scrollToBottom = () => {
     const chatMessages = document.querySelector('.chat-messages');
