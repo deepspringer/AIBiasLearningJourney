@@ -54,14 +54,29 @@ async function main() {
       );
     `);
     
+    // Add role column if it doesn't exist
+    await db.execute(`
+      DO $$ 
+      BEGIN 
+        IF NOT EXISTS (
+          SELECT FROM information_schema.columns 
+          WHERE table_name = 'users' AND column_name = 'role'
+        ) THEN 
+          ALTER TABLE users 
+          ADD COLUMN role TEXT CHECK (role IN ('teacher', 'admin', 'student')) NOT NULL DEFAULT 'student';
+        END IF;
+      END $$;
+    `);
+
     console.log("Database schema migrated successfully");
     
-    // Create a default user for testing
+    // Create a default user for testing with hashed password
+    const hashedPassword = await bcrypt.hash('password', 10);
     await db.execute(`
-      INSERT INTO users (username, password)
-      VALUES ('test', 'password')
+      INSERT INTO users (username, password, display_name, role)
+      VALUES ('test', $1, 'test', 'student')
       ON CONFLICT (username) DO NOTHING;
-    `);
+    `, [hashedPassword]);
     
     console.log("Default user created");
   } catch (error) {
