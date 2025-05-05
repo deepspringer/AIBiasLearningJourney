@@ -173,7 +173,7 @@ ${ENGAGEMENT_GUIDANCE}`;
           You should help them formulate new sentences and demographic labels to check, then help them interpret their outputs. You can suggest general sentences (e.g. "The * person is "), You can suggest ones related to hiring or college admissions (e.g. We the hiring committe have examined the qualifications of *, and on a scale of 1-5 have awarded them: "). You can suggest that they use demographically coded names such as the ones used in the Silicon Ceiling paper. And you can remind them of the names used there. You can suggest demographic labels related to an international context as in the IndiBias paper. (e.g. their demographic labels could be Brahmin, Vaishya, Kshatriya, and Shudra). You can suggest they try making fictional stories (e.g. "Once upon a time there was a * who wanted to be a ")
           _______________
           For reference, they just read this text: 
-          ${ALGORITHMIC_BIAS_TEXT}
+          ${selectedModule ? selectedModule.text.join("\n") : ""}
           _______________
           As you talk to them, follow this guidance:
           ${ENGAGEMENT_GUIDANCE}`;
@@ -192,7 +192,7 @@ ${ENGAGEMENT_GUIDANCE}`;
 
           _______________
           For reference, they just read this text: 
-          ${ALGORITHMIC_BIAS_TEXT}
+          ${selectedModule ? selectedModule.text.join("\n") : ""}
           _______________
           As you talk to them, follow this guidance:
           ${ENGAGEMENT_GUIDANCE}`;
@@ -263,7 +263,7 @@ ${ENGAGEMENT_GUIDANCE}`;
           );
         });
         const engagementResult = await checkEngagement(
-          ALGORITHMIC_BIAS_TEXT[currentParagraph - 1],
+          selectedModule ? selectedModule.text[currentParagraph - 1] : "",
           paragraphMessages,
           userId || "",
           currentParagraph,
@@ -333,7 +333,7 @@ ${ENGAGEMENT_GUIDANCE}`;
 
   const handleFloatingActionClick = () => {
     if (currentPhase === 1) {
-      if (currentParagraph === ALGORITHMIC_BIAS_TEXT.length) {
+      if (selectedModule && currentParagraph === selectedModule.text.length) {
         setCurrentPhase(2);
       } else {
         handleParagraphChange(currentParagraph + 1);
@@ -364,11 +364,12 @@ ${ENGAGEMENT_GUIDANCE}`;
                 currentPhase={currentPhase}
                 onPhaseChange={setCurrentPhase}
                 isPhase2Unlocked={
-                  currentPhase === 2 ||
-                  (currentPhase === 1 &&
-                    currentParagraph === ALGORITHMIC_BIAS_TEXT.length &&
-                    (paragraphMessageCounts[currentParagraph] || 0) >= 2)
-                }
+                    currentPhase === 2 ||
+                    (currentPhase === 1 &&
+                      selectedModule &&
+                      currentParagraph === selectedModule.text.length &&
+                      (paragraphMessageCounts[currentParagraph] || 0) >= 2)
+                  }
                 isPhase3Unlocked={currentPhase === 3 || phase2Messages.length >= 10}
               />
 
@@ -415,7 +416,7 @@ ${ENGAGEMENT_GUIDANCE}`;
             isEngaged={paragraphEngagement[currentParagraph] || false}
             messageCount={paragraphMessageCounts[currentParagraph] || 0}
             onFloatingActionClick={handleFloatingActionClick}
-            isLastParagraph={currentParagraph === ALGORITHMIC_BIAS_TEXT.length}
+            isLastParagraph={selectedModule ? currentParagraph === selectedModule.text.length : false}
             onFinish={() => {
               setShowingSurvey(true);
             }}
