@@ -36,10 +36,10 @@ export async function handleLogin(req: Request, res: Response) {
       });
     }
 
-    // Handle case where password might be stored unhashed
+    // Compare hashed passwords
     console.log("Stored password:", user.password);
     console.log("Provided password:", password);
-    const isValid = user.password === password || await bcrypt.compare(password, user.password);
+    const isValid = await bcrypt.compare(password, user.password);
     console.log("Password valid:", isValid);
     if (!isValid) {
       return res.status(401).json({
