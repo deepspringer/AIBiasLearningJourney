@@ -55,7 +55,14 @@ export default function LoginPage() {
       }
 
       const result = await response.json();
+      console.log("Login response:", result);
 
+      console.log("Storing user data in localStorage:", {
+        userId: result.id,
+        displayName: result.displayName,
+        role: result.role
+      });
+      
       localStorage.setItem("userId", result.id.toString());
       localStorage.setItem("displayName", result.displayName);
       localStorage.setItem("roles", result.role);
