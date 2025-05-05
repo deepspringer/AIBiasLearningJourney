@@ -44,12 +44,16 @@ export async function handleChat(req: Request, res: Response) {
 
     // Enhance the system prompt based on the phase
     if (phase === 1 && paragraph !== undefined) {
+      console.log("[Phase 1] Starting paragraph processing for paragraph:", paragraph);
       const module = await storage.getModule(3); // TODO: Make this dynamic based on selected module
       if (module && module.text) {
+        console.log("[Phase 1] Retrieved module text, length:", module.text.length);
         const fullText = module.text.join("\n\n");
         const currentParagraph = module.text[paragraph - 1];
+        console.log("[Phase 1] Current paragraph length:", currentParagraph.length);
 
         finalSystemPrompt = `You are helping to guide a student through the following text paragraph by paragraph: ${fullText}. ${systemPrompt} This is the paragraph you are discussing: ${currentParagraph}`;
+        console.log("[Phase 1] Generated final system prompt, length:", finalSystemPrompt.length);
       }
     }
 

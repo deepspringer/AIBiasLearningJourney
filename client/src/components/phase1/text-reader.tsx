@@ -12,12 +12,14 @@ const TextReader = ({ currentParagraph, onParagraphChange, paragraphMessageCount
   const totalParagraphs = moduleText.length;
 
   const handlePrevious = () => {
+    console.log("[Phase 1] Previous button clicked. Current paragraph:", currentParagraph);
     if (currentParagraph > 1) {
       onParagraphChange(currentParagraph - 1);
     }
   };
 
   const handleNext = () => {
+    console.log("[Phase 1] Next button clicked. Current paragraph:", currentParagraph);
     if (currentParagraph < totalParagraphs) {
       onParagraphChange(currentParagraph + 1);
     }

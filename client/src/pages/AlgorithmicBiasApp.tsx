@@ -158,7 +158,9 @@ Any other groups you can think of
 
       switch (currentPhase) {
         case 1:
+          console.log("[Phase 1] Building system prompt with module:", selectedModule?.name);
           systemPrompt = `${selectedModule?.systemPromptRead || ""}\n\n${ENGAGEMENT_GUIDANCE}`;
+          console.log("[Phase 1] Generated system prompt length:", systemPrompt.length);
           break;
         case 2:
           systemPrompt = `${selectedModule?.systemPromptExperiment || ""}\n_______________\nFor reference, they just read this text:\n${selectedModule ? selectedModule.text.join("\n") : ""}\n_______________\nAs you talk to them, follow this guidance:\n${ENGAGEMENT_GUIDANCE}`;
