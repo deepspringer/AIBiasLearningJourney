@@ -19,8 +19,6 @@ function Router() {
     // Check if user is authenticated by looking for userId in localStorage
     const userId = localStorage.getItem("userId");
     setIsAuthenticated(!!userId);
-    
-    console.log("Auth check:", !!userId, "at path:", location);
   }, [location]);
 
   // We've simplified the routing, so we no longer need this redirection logic

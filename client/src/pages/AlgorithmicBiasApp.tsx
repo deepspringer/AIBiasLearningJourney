@@ -149,10 +149,6 @@ Any other groups you can think of
       if (currentPhase === 2) {
         setPhase2Messages((prev) => {
           const newMessages = [...prev, { role: "user", content: message }];
-          console.log(
-            "[Debug] Phase 2 messages after user message:",
-            newMessages.length,
-          );
           return newMessages;
         });
       }
@@ -230,10 +226,6 @@ ${ENGAGEMENT_GUIDANCE}`;
       if (currentPhase === 2) {
         setPhase2Messages((prev) => {
           const newMessages = [...prev, assistantMessage];
-          console.log(
-            "[Debug] Phase 2 messages after assistant response:",
-            newMessages.length,
-          );
           return newMessages;
         });
       }
@@ -316,7 +308,6 @@ ${ENGAGEMENT_GUIDANCE}`;
       }
 
       const data = await response.json();
-      console.log("Engagement data:", data);
       return data.engaged;
     } catch (error) {
       console.error("Error checking engagement:", error);
@@ -426,9 +417,7 @@ ${ENGAGEMENT_GUIDANCE}`;
             onFloatingActionClick={handleFloatingActionClick}
             isLastParagraph={currentParagraph === ALGORITHMIC_BIAS_TEXT.length}
             onFinish={() => {
-              console.log("[AlgorithmicBiasApp] Setting showingSurvey to true");
               setShowingSurvey(true);
-              console.log("[AlgorithmicBiasApp] Current phase:", currentPhase);
             }}
           />
 
