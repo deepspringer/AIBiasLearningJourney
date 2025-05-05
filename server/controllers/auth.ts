@@ -26,15 +26,21 @@ export async function handleLogin(req: Request, res: Response) {
 
     // Find user
     const user = await storage.getUserByUsername(username);
+    console.log("Login attempt for username:", username);
+    console.log("Found user:", user);
 
     if (!user) {
+      console.log("User not found");
       return res.status(401).json({
         error: "Invalid credentials",
       });
     }
 
     // Handle case where password might be stored unhashed
+    console.log("Stored password:", user.password);
+    console.log("Provided password:", password);
     const isValid = user.password === password || await bcrypt.compare(password, user.password);
+    console.log("Password valid:", isValid);
     if (!isValid) {
       return res.status(401).json({
         error: "Invalid credentials",
