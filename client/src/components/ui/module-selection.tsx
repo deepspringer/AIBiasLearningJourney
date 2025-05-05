@@ -13,8 +13,8 @@ interface ModuleSelectionProps {
 }
 
 const isAdmin = () => {
-  const roles = localStorage.getItem("roles");
-  return roles?.includes("admin") || false;
+  const role = localStorage.getItem("roles");
+  return role === "admin";
 };
 
 export default function ModuleSelection({ onModuleSelect }: ModuleSelectionProps) {

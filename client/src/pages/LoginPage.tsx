@@ -58,6 +58,7 @@ export default function LoginPage() {
 
       localStorage.setItem("userId", result.id.toString());
       localStorage.setItem("displayName", result.displayName);
+      localStorage.setItem("roles", result.role);
 
       toast({
         title: "Welcome back!",
