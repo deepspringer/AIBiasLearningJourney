@@ -39,6 +39,9 @@ export async function handleLogin(req: Request, res: Response) {
     // Compare hashed passwords
     console.log("Stored password:", user.password);
     console.log("Provided password:", password);
+    // Hash the provided password with the same salt
+    const hashedProvided = await bcrypt.hash(password, 10);
+    console.log("Hashed provided password:", hashedProvided);
     const isValid = await bcrypt.compare(password, user.password);
     console.log("Password valid:", isValid);
     if (!isValid) {
