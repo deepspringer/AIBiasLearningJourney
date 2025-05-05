@@ -120,6 +120,14 @@ export class DatabaseStorage implements IStorage {
     console.log("Created module:", result);
     return result[0];
   }
+
+  async updateModule(id: number, data: Partial<any>): Promise<any> {
+    const result = await db.update(modules)
+      .set(data)
+      .where(eq(modules.id, id))
+      .returning();
+    return result[0];
+  }
 }
 
 export const storage = new DatabaseStorage();

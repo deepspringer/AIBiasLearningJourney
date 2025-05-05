@@ -42,6 +42,18 @@ export async function registerRoutes(app: Express): Promise<Server> {
       res.json(modules);
     } catch (error) {
       console.error('Error fetching modules:', error);
+
+app.put("/api/modules/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+    const result = await storage.updateModule(parseInt(id, 10), req.body);
+    res.json(result);
+  } catch (error) {
+    console.error('Error updating module:', error);
+    res.status(500).json({ error: 'Failed to update module' });
+  }
+});
+
       res.status(500).json({ error: 'Failed to fetch modules' });
     }
   });
