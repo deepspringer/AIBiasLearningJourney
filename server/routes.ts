@@ -25,7 +25,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Module endpoints
   app.post("/api/modules", async (req, res) => {
-    console.log("[4] API /modules POST endpoint called", req.body);
+    
     try {
       const newModule = await storage.createModule(req.body);
       res.json(newModule);
@@ -36,7 +36,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/modules", async (req, res) => {
-    console.log("[4] API /modules GET endpoint called");
+    
     try {
       const modules = await storage.getModules();
       res.json(modules);

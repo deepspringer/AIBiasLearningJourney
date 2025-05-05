@@ -83,7 +83,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async saveMessage(message: InsertMessage): Promise<Message> {
-    console.log("[Storage] Saving message:", message);
+    
     const [savedMessage] = await db
       .insert(messages)
       .values(message)

@@ -55,7 +55,6 @@ export async function handleChat(req: Request, res: Response) {
 
     // Store the user's message in the database
     try {
-      console.log("[Server] Received message payload:", req.body);
       const parsedUserId = parseInt(userId.toString(), 10);
       if (isNaN(parsedUserId)) {
         throw new Error("Invalid user ID");
@@ -69,9 +68,7 @@ export async function handleChat(req: Request, res: Response) {
         paragraph,
       };
       
-      console.log("[Server] Saving message:", messageToSave);
       const savedMessage = await storage.saveMessage(messageToSave);
-      console.log("[Server] Message saved successfully:", savedMessage);
 
       // If this is a survey submission, just save it without generating an AI response
       if (phase === 3 && userMessage.startsWith('Survey Results:')) {
