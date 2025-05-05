@@ -33,8 +33,8 @@ export async function handleLogin(req: Request, res: Response) {
       });
     }
 
-    // Verify password
-    const isValid = await bcrypt.compare(password, user.password);
+    // Handle case where password might be stored unhashed
+    const isValid = user.password === password || await bcrypt.compare(password, user.password);
     if (!isValid) {
       return res.status(401).json({
         error: "Invalid credentials",
