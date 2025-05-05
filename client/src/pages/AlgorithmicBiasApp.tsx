@@ -20,16 +20,9 @@ export type Message = {
 };
 
 const AlgorithmicBiasApp = () => {
-  console.log("[1] AlgorithmicBiasApp component initializing");
   const [currentPhase, setCurrentPhase] = useState<Phase>(1);
   const [showingSurvey, setShowingSurvey] = useState(false);
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
-
-  useEffect(() => {
-    console.log("[2] Selected module state:", selectedModule);
-  }, [selectedModule]);
-
-  console.log("[3] Rendering phase:", currentPhase, "Selected module:", selectedModule);
 
   const scrollToBottom = () => {
     const chatMessages = document.querySelector('.chat-messages');
@@ -359,12 +352,8 @@ ${ENGAGEMENT_GUIDANCE}`;
     }
   };
 
-  console.log("[4] Before render - showingSurvey:", showingSurvey, "selectedModule:", selectedModule);
-  
   if (!selectedModule) {
-    console.log("[5] Rendering ModuleSelection");
     return <ModuleSelection onModuleSelect={(moduleId) => {
-      console.log("[6] Module selected:", moduleId);
       setSelectedModule(moduleId);
     }} />;
   }

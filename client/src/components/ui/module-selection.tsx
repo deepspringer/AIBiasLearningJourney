@@ -14,7 +14,6 @@ interface ModuleSelectionProps {
 
 const isAdmin = () => {
   const role = localStorage.getItem("roles");
-  console.log("Current user role:", role);
   return role === "admin" || role === "ADMIN"; // Handle case variations
 };
 
@@ -23,7 +22,6 @@ export default function ModuleSelection({ onModuleSelect }: ModuleSelectionProps
   const [loading, setLoading] = useState(true);
   
   const adminStatus = isAdmin();
-  console.log("Admin status check:", adminStatus, "Role from localStorage:", localStorage.getItem("roles"));
 
   useEffect(() => {
     fetch('/api/modules')
