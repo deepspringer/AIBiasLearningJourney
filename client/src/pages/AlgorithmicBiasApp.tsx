@@ -24,6 +24,12 @@ const AlgorithmicBiasApp = () => {
   const [showingSurvey, setShowingSurvey] = useState(false);
   const [selectedModule, setSelectedModule] = useState<number | null>(null);
 
+  useEffect(() => {
+    console.log("[2] Selected module state:", selectedModule);
+  }, [selectedModule]);
+
+  console.log("[3] Rendering phase:", currentPhase, "Selected module:", selectedModule);
+
   const scrollToBottom = () => {
     const chatMessages = document.querySelector('.chat-messages');
     if (chatMessages) {
@@ -351,6 +357,16 @@ ${ENGAGEMENT_GUIDANCE}`;
       setCurrentPhase(3);
     }
   };
+
+  console.log("[4] Before render - showingSurvey:", showingSurvey, "selectedModule:", selectedModule);
+  
+  if (!selectedModule) {
+    console.log("[5] Rendering ModuleSelection");
+    return <ModuleSelection onModuleSelect={(moduleId) => {
+      console.log("[6] Module selected:", moduleId);
+      setSelectedModule(moduleId);
+    }} />;
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 text-gray-800">
