@@ -19,6 +19,7 @@ export type Message = {
 };
 
 const AlgorithmicBiasApp = () => {
+  console.log("[1] AlgorithmicBiasApp component initializing");
   const [currentPhase, setCurrentPhase] = useState<Phase>(1);
   const [showingSurvey, setShowingSurvey] = useState(false);
   const [selectedModule, setSelectedModule] = useState<number | null>(null);

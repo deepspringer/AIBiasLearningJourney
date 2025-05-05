@@ -22,9 +22,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
   // Engagement check endpoint
   app.post("/api/check-engagement", handleEngagementCheck);
-  
+
   // Get modules endpoint
   app.get("/api/modules", async (req, res) => {
+    console.log("[4] API /modules endpoint called");
     try {
       const modules = await storage.getModules();
       res.json(modules);

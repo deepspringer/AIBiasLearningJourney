@@ -13,10 +13,12 @@ interface ModuleSelectionProps {
 }
 
 export default function ModuleSelection({ onModuleSelect }: ModuleSelectionProps) {
+  console.log("[2] ModuleSelection component mounting");
   const [modules, setModules] = useState<Module[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    console.log("[3] Fetching modules from API");
     fetch('/api/modules')
       .then(res => res.json())
       .then(data => {
