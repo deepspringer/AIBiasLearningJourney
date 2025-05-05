@@ -1,12 +1,5 @@
-
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-
-interface TextReaderProps {
-  currentParagraph: number;
-  onParagraphChange: (paragraph: number) => void;
-  paragraphMessageCounts: Record<number, number>;
-}
 
 interface TextReaderProps {
   currentParagraph: number;
@@ -42,7 +35,7 @@ const TextReader = ({ currentParagraph, onParagraphChange, paragraphMessageCount
           Understanding Algorithmic Bias
         </h2>
       </div>
-      
+
       <div className="p-6">
         {/* Paragraph Navigation */}
         <div className="flex justify-between items-center mb-6">
@@ -58,11 +51,11 @@ const TextReader = ({ currentParagraph, onParagraphChange, paragraphMessageCount
             </span>
             Previous
           </button>
-          
+
           <span className="text-sm text-gray-500">
             Paragraph {currentParagraph} of {totalParagraphs}
           </span>
-          
+
           <button
             onClick={handleNext}
             disabled={currentParagraph === totalParagraphs || (paragraphMessageCounts[currentParagraph] || 0) === 0}
@@ -76,26 +69,26 @@ const TextReader = ({ currentParagraph, onParagraphChange, paragraphMessageCount
             </span>
           </button>
         </div>
-        
+
         {/* Text Content */}
         <div className="prose max-w-none h-[calc(100vh-300px)] overflow-y-auto">
-          {ALGORITHMIC_BIAS_TEXT.map((paragraph, index) => (
-            <div
-              key={index}
-              className={`paragraph mb-4 ${
-                index + 1 === currentParagraph
-                  ? "active bg-blue-50 p-4 rounded-md border-l-4 border-primary"
-                  : "hidden"
-              }`}
-            >
-              <div className="prose prose-lg max-w-none">
-                <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                  {paragraph}
-                </ReactMarkdown>
+            {moduleText.map((paragraph, index) => (
+              <div
+                key={index}
+                className={`paragraph mb-4 ${
+                  index + 1 === currentParagraph
+                    ? "active bg-blue-50 p-4 rounded-md border-l-4 border-primary"
+                    : "hidden"
+                }`}
+              >
+                <div className="prose prose-lg max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {paragraph}
+                  </ReactMarkdown>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
       </div>
     </div>
   );
