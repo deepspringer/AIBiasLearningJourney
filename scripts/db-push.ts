@@ -79,6 +79,43 @@ async function main() {
     `, [hashedPassword]);
     
     console.log("Default user created");
+    
+    // Create modules table
+    await db.execute(`
+      CREATE TABLE IF NOT EXISTS modules (
+        id SERIAL PRIMARY KEY,
+        name TEXT NOT NULL,
+        description TEXT NOT NULL,
+        text JSONB NOT NULL,
+        system_prompt_read TEXT NOT NULL,
+        experiment_html TEXT NOT NULL,
+        system_prompt_experiment TEXT NOT NULL,
+        conclude_text TEXT NOT NULL,
+        system_prompt_conclude TEXT NOT NULL
+      );
+    `);
+    
+    // Insert sample module
+    await db.execute(`
+      INSERT INTO modules (
+        name, description, text, system_prompt_read, 
+        experiment_html, system_prompt_experiment,
+        conclude_text, system_prompt_conclude
+      )
+      VALUES (
+        'Understanding AI Bias',
+        'Learn about bias in AI systems through interactive experiments',
+        '["AI systems can exhibit various forms of bias.", "These biases often stem from training data and algorithm design.", "Understanding these biases is crucial for responsible AI development."]',
+        'You are a helpful AI tutor guiding students through understanding AI bias concepts.',
+        '<div class="experiment-container"><h2>Bias Testing Interface</h2><div id="test-area"></div></div>',
+        'You are helping students conduct and analyze bias experiments.',
+        'Reflect on what you''ve learned about AI bias and its implications.',
+        'You are helping students form meaningful conclusions about AI bias.'
+      )
+      ON CONFLICT DO NOTHING;
+    `);
+    
+    console.log("Modules table created and populated");
   } catch (error) {
     console.error("Error during migration:", error);
     process.exit(1);
