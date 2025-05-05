@@ -11,9 +11,6 @@ import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 
 const loginSchema = z.object({
-  displayName: z.string().min(2, {
-    message: "Display name must be at least 2 characters.",
-  }),
   username: z.string().min(3, {
     message: "Username must be at least 3 characters.",
   }),
@@ -32,7 +29,6 @@ export default function LoginPage() {
   const form = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
     defaultValues: {
-      displayName: "",
       username: "",
       password: "",
     },
@@ -48,37 +44,33 @@ export default function LoginPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          displayName: data.displayName,
           username: data.username,
           password: data.password,
         }),
       });
-      
+
       if (!response.ok) {
-        throw new Error("Login failed");
+        const error = await response.json();
+        throw new Error(error.error || "Login failed");
       }
-      
+
       const result = await response.json();
 
       localStorage.setItem("userId", result.id.toString());
-      localStorage.setItem("displayName", data.displayName);
+      localStorage.setItem("displayName", result.displayName);
 
       toast({
-        title: "Welcome!",
-        description: `You've signed in as ${data.displayName}`,
+        title: "Welcome back!",
+        description: `You've signed in as ${result.displayName}`,
       });
 
-      // Navigate to the main application directly by using window.location
-      // This forces a full page refresh which will properly re-initialize the app with the authenticated state
       window.location.href = "/";
-      
-      // For safety, also set the router location
       setLocation("/");
     } catch (error) {
       console.error("Login error:", error);
       toast({
         title: "Error",
-        description: "There was a problem signing you in. Please try again.",
+        description: error instanceof Error ? error.message : "Invalid credentials",
         variant: "destructive",
       });
     } finally {
@@ -92,25 +84,12 @@ export default function LoginPage() {
         <CardHeader className="space-y-1">
           <CardTitle className="text-2xl font-bold text-center">Algorithmic Bias Explorer</CardTitle>
           <CardDescription className="text-center">
-            Enter your name to start exploring algorithmic bias
+            Please sign in to continue
           </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="displayName"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Your Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Enter your name" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
               <FormField
                 control={form.control}
                 name="username"
@@ -138,14 +117,11 @@ export default function LoginPage() {
                 )}
               />
               <Button type="submit" className="w-full" disabled={isSubmitting}>
-                {isSubmitting ? "Signing in..." : "Start Exploring"}
+                {isSubmitting ? "Signing in..." : "Sign In"}
               </Button>
             </form>
           </Form>
         </CardContent>
-        <CardFooter className="flex justify-center text-sm text-gray-500">
-          <p>Your data will be used for educational purposes only</p>
-        </CardFooter>
       </Card>
     </div>
   );

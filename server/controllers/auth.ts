@@ -1,8 +1,6 @@
-
 import { Request, Response } from "express";
 import bcrypt from "bcryptjs";
 import { storage } from "../storage";
-import { insertUserSchema } from "../../shared/schema";
 
 declare module 'express-session' {
   interface SessionData {
@@ -29,44 +27,29 @@ export async function handleLogin(req: Request, res: Response) {
     // Find user
     const user = await storage.getUserByUsername(username);
 
-    if (user) {
-      // Verify password
-      const isValid = await bcrypt.compare(password, user.password);
-      if (!isValid) {
-        return res.status(401).json({
-          error: "Invalid credentials",
-        });
-      }
-
-      // Set session
-      req.session.userId = user.id;
-
-      return res.status(200).json({
-        id: user.id,
-        username: user.username,
-        displayName: user.displayName,
-        role: user.role
-      });
-    } else {
-      // Create new user with hashed password
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const userData = insertUserSchema.parse({
-        username,
-        displayName: username,
-        password: hashedPassword,
-        role: "student"
-      });
-
-      const newUser = await storage.createUser(userData);
-      req.session.userId = newUser.id;
-
-      return res.status(200).json({
-        id: newUser.id,
-        username: newUser.username,
-        displayName: newUser.displayName,
-        role: newUser.role
+    if (!user) {
+      return res.status(401).json({
+        error: "Invalid credentials",
       });
     }
+
+    // Verify password
+    const isValid = await bcrypt.compare(password, user.password);
+    if (!isValid) {
+      return res.status(401).json({
+        error: "Invalid credentials",
+      });
+    }
+
+    // Set session
+    req.session.userId = user.id;
+
+    return res.status(200).json({
+      id: user.id,
+      username: user.username,
+      displayName: user.displayName,
+      role: user.role
+    });
   } catch (error) {
     console.error("Login error:", error);
     return res.status(500).json({
