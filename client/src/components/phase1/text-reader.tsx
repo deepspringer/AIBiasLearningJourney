@@ -1,4 +1,4 @@
-import { ALGORITHMIC_BIAS_TEXT } from "@/constants/text-content";
+
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
@@ -8,8 +8,15 @@ interface TextReaderProps {
   paragraphMessageCounts: Record<number, number>;
 }
 
-const TextReader = ({ currentParagraph, onParagraphChange, paragraphMessageCounts }: TextReaderProps) => {
-  const totalParagraphs = ALGORITHMIC_BIAS_TEXT.length;
+interface TextReaderProps {
+  currentParagraph: number;
+  onParagraphChange: (paragraph: number) => void;
+  paragraphMessageCounts: Record<number, number>;
+  moduleText: string[];
+}
+
+const TextReader = ({ currentParagraph, onParagraphChange, paragraphMessageCounts, moduleText }: TextReaderProps) => {
+  const totalParagraphs = moduleText.length;
 
   const handlePrevious = () => {
     if (currentParagraph > 1) {

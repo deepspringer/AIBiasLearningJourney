@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import ModuleSelection from "@/components/ui/module-selection";
-import { ALGORITHMIC_BIAS_TEXT } from "@/constants/text-content";
+
 import PhaseNavigation from "@/components/ui/phase-navigation";
 import ChatPanel from "@/components/ui/chat-panel";
 import PhaseContent from "@/components/ui/phase-content";
@@ -22,7 +22,7 @@ export type Message = {
 const AlgorithmicBiasApp = () => {
   const [currentPhase, setCurrentPhase] = useState<Phase>(1);
   const [showingSurvey, setShowingSurvey] = useState(false);
-  const [selectedModule, setSelectedModule] = useState<number | null>(null);
+  const [selectedModule, setSelectedModule] = useState<{id: number, text: string[]} | null>(null);
 
   const scrollToBottom = () => {
     const chatMessages = document.querySelector('.chat-messages');
@@ -423,11 +423,12 @@ ${ENGAGEMENT_GUIDANCE}`;
 
           {/* Content Panel */}
           <PhaseContent currentPhase={currentPhase}>
-            {currentPhase === 1 && (
+            {currentPhase === 1 && selectedModule && (
               <TextReader
                 currentParagraph={currentParagraph}
                 onParagraphChange={handleParagraphChange}
-                paragraphMessageCounts={paragraphMessageCounts} // Pass message counts to TextReader
+                paragraphMessageCounts={paragraphMessageCounts}
+                moduleText={selectedModule.text}
               />
             )}
             {(currentPhase === 2 || (currentPhase === 3 && !showingSurvey)) && (
