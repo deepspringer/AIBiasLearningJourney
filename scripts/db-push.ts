@@ -22,8 +22,9 @@ async function main() {
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
         username TEXT NOT NULL UNIQUE,
-        password TEXT,
-        display_name TEXT
+        password TEXT NOT NULL,
+        display_name TEXT NOT NULL,
+        role TEXT CHECK (role IN ('teacher', 'admin', 'student')) NOT NULL DEFAULT 'student'
       );
       
       CREATE TABLE IF NOT EXISTS conclusions (
