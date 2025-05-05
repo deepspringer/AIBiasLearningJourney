@@ -1,6 +1,5 @@
 import type { Request, Response } from "express";
 import OpenAI from "openai";
-import { ALGORITHMIC_BIAS_TEXT } from "../../client/src/constants/text-content";
 import { storage } from "../storage";
 
 const openai = new OpenAI({
@@ -45,10 +44,13 @@ export async function handleChat(req: Request, res: Response) {
 
     // Enhance the system prompt based on the phase
     if (phase === 1 && paragraph !== undefined) {
-      const fullText = ALGORITHMIC_BIAS_TEXT.join("\n\n");
-      const currentParagraph = ALGORITHMIC_BIAS_TEXT[paragraph - 1];
+      const module = await storage.getModule(3); // TODO: Make this dynamic based on selected module
+      if (module && module.text) {
+        const fullText = module.text.join("\n\n");
+        const currentParagraph = module.text[paragraph - 1];
 
-      finalSystemPrompt = `You are helping to guide a student through the following text paragraph by paragraph: ${fullText}. ${systemPrompt} This is the paragraph you are discussing: ${currentParagraph}`;
+        finalSystemPrompt = `You are helping to guide a student through the following text paragraph by paragraph: ${fullText}. ${systemPrompt} This is the paragraph you are discussing: ${currentParagraph}`;
+      }
     }
 
     // Store the user's message in the database
