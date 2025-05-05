@@ -13,14 +13,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 
 const moduleSchema = z.object({
-  name: z.string().min(3),
-  description: z.string().min(10),
-  text: z.array(z.string()).min(1),
-  system_prompt_read: z.string().min(10),
-  experiment_html: z.string(),
-  system_prompt_experiment: z.string().min(10),
-  conclude_text: z.string().min(10),
-  system_prompt_conclude: z.string().min(10),
+  name: z.string().min(3, "Name must be at least 3 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  text: z.array(z.string()).min(1, "At least one text paragraph is required"),
+  system_prompt_read: z.string().min(10, "Reading prompt must be at least 10 characters"),
+  experiment_html: z.string().min(10, "Experiment HTML must be at least 10 characters"),
+  system_prompt_experiment: z.string().min(10, "Experiment prompt must be at least 10 characters"),
+  conclude_text: z.string().min(10, "Conclusion text must be at least 10 characters"),
+  system_prompt_conclude: z.string().min(10, "Conclusion prompt must be at least 10 characters"),
 });
 
 type ModuleFormValues = z.infer<typeof moduleSchema>;
@@ -29,6 +29,7 @@ export default function AddModulePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
+  const [paragraphCount, setParagraphCount] = useState(1);
 
   const form = useForm<ModuleFormValues>({
     resolver: zodResolver(moduleSchema),
@@ -108,6 +109,7 @@ export default function AddModulePage() {
                   </FormItem>
                 )}
               />
+              
               <FormField
                 control={form.control}
                 name="description"
@@ -121,6 +123,104 @@ export default function AddModulePage() {
                   </FormItem>
                 )}
               />
+
+              <div className="space-y-4">
+                <FormLabel>Module Text Paragraphs</FormLabel>
+                {Array.from({ length: paragraphCount }).map((_, index) => (
+                  <FormField
+                    key={index}
+                    control={form.control}
+                    name={`text.${index}`}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Paragraph {index + 1}</FormLabel>
+                        <FormControl>
+                          <Textarea {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => setParagraphCount(prev => prev + 1)}
+                >
+                  Add Paragraph
+                </Button>
+              </div>
+
+              <FormField
+                control={form.control}
+                name="system_prompt_read"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Reading System Prompt</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="experiment_html"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Experiment HTML</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="system_prompt_experiment"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Experiment System Prompt</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="conclude_text"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Conclusion Text</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="system_prompt_conclude"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Conclusion System Prompt</FormLabel>
+                    <FormControl>
+                      <Textarea {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
               <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting ? "Creating..." : "Create Module"}
               </Button>
