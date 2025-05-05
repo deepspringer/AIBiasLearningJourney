@@ -179,6 +179,7 @@ Any other groups you can think of
           systemPrompt,
           userMessage: fullMessage,
           phase: currentPhase,
+          moduleId: selectedModule?.id,
           paragraph: currentPhase === 1 ? currentParagraph : undefined,
           chatHistory: messages.filter((msg) => msg.role !== "system"),
           userId: userId, // Include user ID with all requests
