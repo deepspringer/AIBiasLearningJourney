@@ -33,7 +33,14 @@ export default function AddModulePage() {
   const form = useForm<ModuleFormValues>({
     resolver: zodResolver(moduleSchema),
     defaultValues: {
+      name: "",
+      description: "",
       text: [""],
+      system_prompt_read: "",
+      experiment_html: "",
+      system_prompt_experiment: "",
+      conclude_text: "",
+      system_prompt_conclude: "",
     },
   });
 
