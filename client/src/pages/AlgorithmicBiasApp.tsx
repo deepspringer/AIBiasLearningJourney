@@ -400,6 +400,8 @@ Any other groups you can think of
             )}
             {(currentPhase === 2 || (currentPhase === 3 && !showingSurvey)) && (
               <div data-selected-module data-experiment-html={selectedModule?.experimentHtml || ''}>
+                {console.log("[AlgorithmicBiasApp] selectedModule:", selectedModule)}
+                {console.log("[AlgorithmicBiasApp] experimentHtml being passed:", selectedModule?.experimentHtml || '')}
                 <BiasTestingTool 
                   onSendMessage={handleSendMessage}
                   experimentHtml={selectedModule?.experimentHtml || ''}

@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 
 interface BiasTestingToolProps {
@@ -6,9 +7,19 @@ interface BiasTestingToolProps {
 }
 
 const BiasTestingTool = ({ onSendMessage, experimentHtml }: BiasTestingToolProps) => {
+  console.log("[BiasTestingTool] Component mounted");
+  console.log("[BiasTestingTool] Received experimentHtml prop:", experimentHtml);
+
+  useEffect(() => {
+    console.log("[BiasTestingTool] experimentHtml changed:", experimentHtml);
+  }, [experimentHtml]);
 
   return (
     <div id="phase-2" className="phase-content">
+      <div>
+        <h3>Debug Info:</h3>
+        <pre>{JSON.stringify({experimentHtml}, null, 2)}</pre>
+      </div>
       <div dangerouslySetInnerHTML={{ __html: experimentHtml }} />
     </div>
   );
