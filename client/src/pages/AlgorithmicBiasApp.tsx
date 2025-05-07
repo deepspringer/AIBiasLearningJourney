@@ -335,14 +335,8 @@ Any other groups you can think of
               <PhaseNavigation
                 currentPhase={currentPhase}
                 onPhaseChange={setCurrentPhase}
-                isPhase2Unlocked={
-                    currentPhase === 2 ||
-                    (currentPhase === 1 &&
-                      selectedModule &&
-                      currentParagraph === selectedModule.text.length &&
-                      (paragraphMessageCounts[currentParagraph] || 0) >= 2)
-                  }
-                isPhase3Unlocked={currentPhase === 3 || phase2Messages.length >= 10}
+                isPhase2Unlocked={true}
+                isPhase3Unlocked={true}
               />
 
               {/* User info and logout */}
