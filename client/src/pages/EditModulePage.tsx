@@ -48,11 +48,11 @@ export default function EditModulePage() {
           name: module.name,
           description: module.description,
           text: module.text,
-          system_prompt_read: module.system_prompt_read,
-          experiment_html: module.experiment_html,
-          system_prompt_experiment: module.system_prompt_experiment,
-          conclude_text: module.conclude_text,
-          system_prompt_conclude: module.system_prompt_conclude,
+          system_prompt_read: module.systemPromptRead,
+          experiment_html: module.experimentHtml,
+          system_prompt_experiment: module.systemPromptExperiment,
+          conclude_text: module.concludeText,
+          system_prompt_conclude: module.systemPromptConclude,
         });
         
         setParagraphCount(module.text.length);
