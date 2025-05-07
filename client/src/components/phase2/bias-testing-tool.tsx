@@ -12,14 +12,19 @@ interface BiasTestingToolProps {
 }
 
 const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
-  const [template, setTemplate] = useState(
-    "The * students at the school are very",
-  );
-  const [substitutions, setSubstitutions] = useState(
-    "Asian\nWhite\nBlack\nLatino\nMale\nFemale",
-  );
-  const [results, setResults] = useState<BiasTestResult[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const [experimentHtml, setExperimentHtml] = useState("");
+
+  useEffect(() => {
+    // Create an iframe to contain the standalone tool
+    const container = document.createElement('div');
+    container.innerHTML = experimentHtml;
+    
+    // Get the selected module's experiment HTML from the parent component
+    const module = document.querySelector('[data-selected-module]');
+    if (module) {
+      setExperimentHtml(module.getAttribute('data-experiment-html') || '');
+    }
+  }, []);
 
   const hasValidTemplate = template.includes("*");
   const substitutionList = useMemo(
@@ -100,7 +105,7 @@ const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
 
   return (
     <div id="phase-2" className="phase-content">
-      <div className="p-4 border-b border-gray-200 bg-gray-50">
+      <div dangerouslySetInnerHTML={{ __html: experimentHtml }} />
         <h2 className="text-lg font-semibold text-gray-800 flex items-center">
           <span className="mr-2 text-primary">
             <svg

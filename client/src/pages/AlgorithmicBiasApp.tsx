@@ -405,10 +405,12 @@ Any other groups you can think of
               />
             )}
             {(currentPhase === 2 || (currentPhase === 3 && !showingSurvey)) && (
-              <BiasTestingTool 
-                onSendMessage={handleSendMessage}
-                key="bias-tool" // Prevent remounting
-              />
+              <div data-selected-module data-experiment-html={selectedModule?.experimentHtml}>
+                <BiasTestingTool 
+                  onSendMessage={handleSendMessage}
+                  key="bias-tool" // Prevent remounting
+                />
+              </div>
             )}
             {currentPhase === 3 && (
               <div className="space-y-6">
