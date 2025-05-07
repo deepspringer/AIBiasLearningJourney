@@ -23,14 +23,18 @@ const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Create an iframe to contain the standalone tool
-    const container = document.createElement("div");
-    container.innerHTML = experimentHtml;
-
     // Get the selected module's experiment HTML from the parent component
     const module = document.querySelector("[data-selected-module]");
     if (module) {
-      setExperimentHtml(module.getAttribute("data-experiment-html") || "");
+      const html = module.getAttribute("data-experiment-html");
+      if (html) {
+        // Sanitize and set the HTML content
+        const container = document.createElement("div");
+        container.innerHTML = html;
+        setExperimentHtml(html);
+      } else {
+        console.warn("No experiment HTML found in module data");
+      }
     }
   }, []);
 
