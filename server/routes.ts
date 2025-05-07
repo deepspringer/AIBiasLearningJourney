@@ -36,14 +36,30 @@ export async function registerRoutes(app: Express): Promise<Server> {
   });
 
   app.get("/api/modules", async (req, res) => {
-    
     try {
       const modules = await storage.getModules();
       res.json(modules);
     } catch (error) {
       console.error('Error fetching modules:', error);
+      res.status(500).json({ error: 'Failed to fetch modules' });
+    }
+  });
 
-app.put("/api/modules/:id", async (req, res) => {
+  app.get("/api/modules/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const module = await storage.getModule(parseInt(id, 10));
+      if (!module) {
+        return res.status(404).json({ error: 'Module not found' });
+      }
+      res.json(module);
+    } catch (error) {
+      console.error('Error fetching module:', error);
+      res.status(500).json({ error: 'Failed to fetch module' });
+    }
+  });
+
+  app.put("/api/modules/:id", async (req, res) => {
   try {
     const { id } = req.params;
     const result = await storage.updateModule(parseInt(id, 10), req.body);
