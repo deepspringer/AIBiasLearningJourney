@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import AlgorithmicBiasApp from "@/pages/AlgorithmicBiasApp";
 import LoginPage from "@/pages/LoginPage";
 import AddModulePage from "@/pages/AddModulePage";
+import EditModulePage from "@/pages/EditModulePage";
 import NotFound from "@/pages/not-found";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
@@ -31,6 +32,7 @@ function Router() {
     <Switch>
       <Route path="/" component={MainApp} />
       <Route path="/add-module" component={isAuthenticated ? AddModulePage : LoginPage} />
+      <Route path="/edit-module/:id" component={isAuthenticated ? EditModulePage : LoginPage} />
       <Route component={NotFound} />
     </Switch>
   );
