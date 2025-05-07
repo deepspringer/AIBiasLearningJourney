@@ -105,8 +105,8 @@ const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
 
   return (
     <div id="phase-2" className="phase-content">
-      <>
-        <div dangerouslySetInnerHTML={{ __html: experimentHtml }} />
+      <div dangerouslySetInnerHTML={{ __html: experimentHtml }} />
+      <div>
         <h2 className="text-lg font-semibold text-gray-800 flex items-center">
           <span className="mr-2 text-primary">
             <svg
