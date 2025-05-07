@@ -127,11 +127,24 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateModule(id: number, data: Partial<any>): Promise<any> {
-    const result = await db.update(modules)
-      .set(data)
-      .where(eq(modules.id, id))
-      .returning();
-    return result[0];
+    console.log("[Storage] Updating module", id, "with data:", data);
+    try {
+      const result = await db.update(modules)
+        .set(data)
+        .where(eq(modules.id, id))
+        .returning();
+      
+      if (!result.length) {
+        console.error("[Storage] No module updated with id:", id);
+        throw new Error("Module not found");
+      }
+      
+      console.log("[Storage] Successfully updated module:", result[0]);
+      return result[0];
+    } catch (error) {
+      console.error("[Storage] Error updating module:", error);
+      throw error;
+    }
   }
 }
 
