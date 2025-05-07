@@ -13,6 +13,10 @@ interface BiasTestingToolProps {
 
 const BiasTestingTool = ({ onSendMessage }: BiasTestingToolProps) => {
   const [experimentHtml, setExperimentHtml] = useState("");
+  const [template, setTemplate] = useState("The * students at the school are very");
+  const [substitutions, setSubstitutions] = useState("Asian\nWhite\nBlack\nLatino\nMale\nFemale");
+  const [results, setResults] = useState<BiasTestResult[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     // Create an iframe to contain the standalone tool
