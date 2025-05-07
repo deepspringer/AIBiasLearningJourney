@@ -399,9 +399,10 @@ Any other groups you can think of
               />
             )}
             {(currentPhase === 2 || (currentPhase === 3 && !showingSurvey)) && (
-              <div data-selected-module data-experiment-html={selectedModule?.experimentHtml}>
+              <div data-selected-module data-experiment-html={selectedModule?.experimentHtml || ''}>
                 <BiasTestingTool 
                   onSendMessage={handleSendMessage}
+                  experimentHtml={selectedModule?.experimentHtml || ''}
                   key="bias-tool" // Prevent remounting
                 />
               </div>
