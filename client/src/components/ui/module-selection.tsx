@@ -9,7 +9,7 @@ type Module = {
 };
 
 interface ModuleSelectionProps {
-  onModuleSelect: (module: {id: number, text: string}) => void; //Updated parameter type
+  onModuleSelect: (module: Module) => void; //Updated parameter type
 }
 
 const isAdmin = () => {
@@ -66,7 +66,7 @@ export default function ModuleSelection({ onModuleSelect }: ModuleSelectionProps
           <Card 
             key={module.id} 
             className="cursor-pointer hover:shadow-lg transition-shadow"
-            onClick={() => onModuleSelect({id: module.id, text: module.text})} // Updated onClick
+            onClick={() => onModuleSelect(module)} // Pass entire module object
           >
             <CardHeader>
               <CardTitle>{module.name}</CardTitle>
@@ -75,7 +75,7 @@ export default function ModuleSelection({ onModuleSelect }: ModuleSelectionProps
             <CardContent>
               <button 
                 className="bg-primary text-white px-4 py-2 rounded-md hover:bg-primary/90 w-full"
-                onClick={() => onModuleSelect({id: module.id, text: module.text})} // Updated onClick
+                onClick={() => onModuleSelect(module)} // Pass entire module object
               >
                 Start Module
               </button>
