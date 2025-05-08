@@ -63,7 +63,20 @@ export async function registerRoutes(app: Express): Promise<Server> {
     try {
       const { id } = req.params;
       console.log("[Routes] Updating module", id, "with body:", req.body);
-      const result = await storage.updateModule(parseInt(id, 10), req.body);
+      
+      // Map request body fields to database column names
+      const mappedData = {
+        name: req.body.name,
+        description: req.body.description,
+        text: req.body.text,
+        systemPromptRead: req.body.system_prompt_read,
+        experimentHtml: req.body.experiment_html,
+        systemPromptExperiment: req.body.system_prompt_experiment,
+        concludeText: req.body.conclude_text,
+        systemPromptConclude: req.body.system_prompt_conclude
+      };
+      
+      const result = await storage.updateModule(parseInt(id, 10), mappedData);
       console.log("[Routes] Module updated successfully:", result);
       res.json(result);
     } catch (error) {
