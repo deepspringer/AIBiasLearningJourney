@@ -1,9 +1,19 @@
-import { 
-  users, type User, type InsertUser, 
-  conclusions, type Conclusion, type InsertConclusion, 
-  biasTestResults, type BiasTestResult, type InsertBiasTestResult,
-  messages, type Message, type InsertMessage,
-  modules, type Module, type InsertModule
+import {
+  users,
+  type User,
+  type InsertUser,
+  conclusions,
+  type Conclusion,
+  type InsertConclusion,
+  biasTestResults,
+  type BiasTestResult,
+  type InsertBiasTestResult,
+  messages,
+  type Message,
+  type InsertMessage,
+  modules,
+  type Module,
+  type InsertModule,
 } from "@shared/schema";
 import { db } from "./db";
 import { eq } from "drizzle-orm";
@@ -36,20 +46,23 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getUserByUsername(username: string): Promise<User | undefined> {
-    const [user] = await db.select().from(users).where(eq(users.username, username));
+    const [user] = await db
+      .select()
+      .from(users)
+      .where(eq(users.username, username));
     return user || undefined;
   }
 
   async createUser(insertUser: InsertUser): Promise<User> {
-    const [user] = await db
-      .insert(users)
-      .values(insertUser)
-      .returning();
+    const [user] = await db.insert(users).values(insertUser).returning();
     return user;
   }
 
   async saveConclusion(conclusion: InsertConclusion): Promise<Conclusion> {
-    console.log("[Storage] Attempting to save conclusion with userId:", conclusion.userId);
+    console.log(
+      "[Storage] Attempting to save conclusion with userId:",
+      conclusion.userId,
+    );
     const [savedConclusion] = await db
       .insert(conclusions)
       .values(conclusion)
@@ -67,7 +80,9 @@ export class DatabaseStorage implements IStorage {
     return conclusion || undefined;
   }
 
-  async saveBiasTestResult(result: InsertBiasTestResult): Promise<BiasTestResult> {
+  async saveBiasTestResult(
+    result: InsertBiasTestResult,
+  ): Promise<BiasTestResult> {
     const [savedResult] = await db
       .insert(biasTestResults)
       .values(result)
@@ -83,7 +98,6 @@ export class DatabaseStorage implements IStorage {
   }
 
   async saveMessage(message: InsertMessage): Promise<Message> {
-    
     const [savedMessage] = await db
       .insert(messages)
       .values(message)
@@ -96,12 +110,11 @@ export class DatabaseStorage implements IStorage {
       .select()
       .from(messages)
       .where(eq(messages.userId, userId))
-      .orderBy(messages.createdAt as any);  // Type assertion to bypass ordering issue
+      .orderBy(messages.createdAt as any); // Type assertion to bypass ordering issue
   }
 
   async getModules(): Promise<any[]> {
     const result = await db.select().from(modules);
-    console.log("Retrieved modules:", result);
     return result;
   }
 
@@ -112,16 +125,19 @@ export class DatabaseStorage implements IStorage {
 
   async createModule(moduleData: any): Promise<any> {
     console.log("Creating module with data:", moduleData);
-    const result = await db.insert(modules).values({
-      name: moduleData.name,
-      description: moduleData.description,
-      text: moduleData.text,
-      systemPromptRead: moduleData.system_prompt_read,
-      experimentHtml: moduleData.experiment_html,
-      systemPromptExperiment: moduleData.system_prompt_experiment,
-      concludeText: moduleData.conclude_text,
-      systemPromptConclude: moduleData.system_prompt_conclude,
-    }).returning();
+    const result = await db
+      .insert(modules)
+      .values({
+        name: moduleData.name,
+        description: moduleData.description,
+        text: moduleData.text,
+        systemPromptRead: moduleData.system_prompt_read,
+        experimentHtml: moduleData.experiment_html,
+        systemPromptExperiment: moduleData.system_prompt_experiment,
+        concludeText: moduleData.conclude_text,
+        systemPromptConclude: moduleData.system_prompt_conclude,
+      })
+      .returning();
     console.log("Created module:", result);
     return result[0];
   }
@@ -129,16 +145,17 @@ export class DatabaseStorage implements IStorage {
   async updateModule(id: number, data: Partial<any>): Promise<any> {
     console.log("[Storage] Updating module", id, "with data:", data);
     try {
-      const result = await db.update(modules)
+      const result = await db
+        .update(modules)
         .set(data)
         .where(eq(modules.id, id))
         .returning();
-      
+
       if (!result.length) {
         console.error("[Storage] No module updated with id:", id);
         throw new Error("Module not found");
       }
-      
+
       console.log("[Storage] Successfully updated module:", result[0]);
       return result[0];
     } catch (error) {
