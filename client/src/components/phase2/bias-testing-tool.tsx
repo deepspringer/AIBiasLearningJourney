@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useRef } from "react";
 
 interface BiasTestingToolProps {
   onSendMessage: (message: string) => void;
@@ -14,14 +15,29 @@ const BiasTestingTool = ({
     "[BiasTestingTool] Received experimentHtml prop:",
     experimentHtml,
   );
+  
+  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   useEffect(() => {
     console.log("[BiasTestingTool] experimentHtml changed:", experimentHtml);
+    if (iframeRef.current) {
+      const iframeDoc = iframeRef.current.contentDocument;
+      if (iframeDoc) {
+        iframeDoc.open();
+        iframeDoc.write(experimentHtml);
+        iframeDoc.close();
+      }
+    }
   }, [experimentHtml]);
 
   return (
     <div id="phase-2" className="phase-content">
-      <div dangerouslySetInnerHTML={{ __html: experimentHtml }} />
+      <iframe 
+        ref={iframeRef}
+        className="w-full h-[600px] border-0"
+        title="Bias Testing Tool"
+        sandbox="allow-scripts allow-same-origin"
+      />
     </div>
   );
 };
