@@ -6,7 +6,7 @@ interface ConclusionWriterProps {
   concludeText?: string;
 }
 
-const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
+const ConclusionWriter = ({ onShowSurvey, concludeText }: ConclusionWriterProps) => {
   const [conclusion, setConclusion] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
