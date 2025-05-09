@@ -414,6 +414,7 @@ Any other groups you can think of
                 {!showingSurvey ? (
                   <>
                     <ConclusionWriter
+                      concludeText={selectedModule?.concludeText}
                       onShowSurvey={() => {
                         const message = {
                           role: "assistant",

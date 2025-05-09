@@ -3,6 +3,7 @@ import Survey from "./survey";
 
 interface ConclusionWriterProps {
   onShowSurvey: () => void;
+  concludeText?: string;
 }
 
 const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
@@ -78,11 +79,7 @@ const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
       <div className="p-6">
         <div className="space-y-4">
           <p className="text-gray-700">
-            Based on what you've learned about algorithmic bias and the
-            experiments you've conducted, write a thoughtful conclusion about
-            your findings and insights. Explain what LLMs are, how they can be
-            biased, what experiments you did, what you saw, what you think this
-            means, and why it is important.
+            {concludeText || "Write your conclusion about algorithmic bias..."}
           </p>
 
           <div>
