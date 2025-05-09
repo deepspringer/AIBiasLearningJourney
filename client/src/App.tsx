@@ -8,6 +8,7 @@ import LoginPage from "@/pages/LoginPage";
 import NotFound from "@/pages/not-found";
 import { useEffect, useState } from "react";
 import { useLocation } from "wouter";
+import TeacherDashboard from "./pages/TeacherDashboard";
 
 function Router() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
@@ -31,6 +32,7 @@ function Router() {
   return (
     <Switch>
       <Route path="/" component={MainApp} />
+      <Route path="/dashboard" component={TeacherDashboard} />
       <Route component={NotFound} />
     </Switch>
   );
