@@ -20,17 +20,17 @@ const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
     setIsSaving(true);
 
     try {
-      const userId = localStorage.getItem('userId');
+      const userId = localStorage.getItem("userId");
       console.log("[Client] Sending conclusion with userId:", userId);
-      
+
       const response = await fetch("/api/save-conclusion", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           conclusion,
-          userId
+          userId,
         }),
       });
 
@@ -47,8 +47,6 @@ const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
       setIsSaving(false);
     }
   };
-
-  
 
   return (
     <div id="phase-3" className="phase-content">
@@ -79,7 +77,7 @@ const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
       <div className="p-6">
         <div className="space-y-4">
           <p className="text-gray-700">
-            {concludeText || "Write your conclusion about algorithmic bias..."}
+            {concludeText || "Write your conclusion..."}
           </p>
 
           <div>
@@ -95,17 +93,7 @@ const ConclusionWriter = ({ onShowSurvey }: ConclusionWriterProps) => {
               onChange={(e) => setConclusion(e.target.value)}
               className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 resize-none p-3 border"
               rows={12}
-              placeholder="LLMs are...
-
-They can be biased because...
-
-I did an experiment where I tried...
-
-I saw...
-
-I think this means...
-
-It is important because..."
+              placeholder="Write your conclusion here..."
             ></textarea>
           </div>
 
@@ -186,7 +174,6 @@ It is important because..."
                 </>
               )}
             </button>
-            
           </div>
         </div>
       </div>

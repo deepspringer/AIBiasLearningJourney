@@ -22,10 +22,13 @@ export type Message = {
 const AlgorithmicBiasApp = () => {
   const [currentPhase, setCurrentPhase] = useState<Phase>(1);
   const [showingSurvey, setShowingSurvey] = useState(false);
-  const [selectedModule, setSelectedModule] = useState<{id: number, text: string[]} | null>(null);
+  const [selectedModule, setSelectedModule] = useState<{
+    id: number;
+    text: string[];
+  } | null>(null);
 
   const scrollToBottom = () => {
-    const chatMessages = document.querySelector('.chat-messages');
+    const chatMessages = document.querySelector(".chat-messages");
     if (chatMessages) {
       chatMessages.scrollTop = chatMessages.scrollHeight;
     }
@@ -33,9 +36,9 @@ const AlgorithmicBiasApp = () => {
   const [messages, setMessages] = useState<Message[]>([
     {
       role: "assistant",
-      content: `Hi. I'm here to teach you about bias in Artificial Intelligence. We'll do three things:  
+      content: `Welcome to LTD Reading. We'll do three things:  
 1. LOOK: You'll read and discuss some ideas  
-2. THINK: You'll experiment with a tool to see how AI responds differently when it's talking about different kinds of people  
+2. THINK: You'll experiment with an interactive tool  
 3. DO: You'll write a conclusion, explaining what you found and why it matters.  
 
 To start, read this first paragraph and tell me what you think.`,
@@ -77,27 +80,15 @@ To start, read this first paragraph and tell me what you think.`,
       switch (currentPhase) {
         case 1:
           phaseMessage =
-            "We're now in the 'look' phase. Let's explore the concept of algorithmic bias paragraph by paragraph. Take your time to read each section, and I'll help you understand the key points.";
+            "We're now in the 'look' phase. Take your time to read each section, and I'll help you understand the key points.";
           break;
         case 2:
-          phaseMessage = `Now we're in the 'think' phase. This is the place to experiment. Try running the example that is set up. It tells you how the newest version of ChatGPT will complete a sentence about different groups of students.  
-
-Then you can change the sentence and the list of groups. In your sentence, leave an asterisk (*) to show where the different group names should go in. And leave your sentence incomplete to find out how the AI will finish it.   
-
-Here are some ideas for sentences:   
-Hiring: "As the hiring committee, on a scale of one to ten, we give the * candidate a score of: "  
-College Admissions: "We, the college admissions committee, have decided that the * student should be "  
-Fictional Stories: "Once upon a time there was a person named * who wanted to be a "  
-
-Here are some ideas for groups:  
-The names used in the Silicon Ceiling paper (Darius Mosby, Katie Burns, etc. You can ask me for more)  
-The religion and caste groups used in the IndiBias paper (Muslim, Hindu, Brahmin, Vaishya, Kshatriya, Shudra, High Caste, Low Caste)  
-Any other groups you can think of  
+          phaseMessage = `Now we're in the 'think' phase. This is the place to experiment. 
 `;
           break;
         case 3:
           phaseMessage =
-            "Now we're in the 'do' phase. It's time to write your conclusion based on what you've learned. What were your key takeaways from the reading and experiments? What surprised you about algorithmic bias?";
+            "Now we're in the 'do' phase. It's time to write your conclusion based on what you've learned. What were your key takeaways from the reading and experiments? What surprised you?";
           break;
       }
 
@@ -158,9 +149,15 @@ Any other groups you can think of
 
       switch (currentPhase) {
         case 1:
-          console.log("[Phase 1] Building system prompt with module:", selectedModule?.name);
+          console.log(
+            "[Phase 1] Building system prompt with module:",
+            selectedModule?.name,
+          );
           systemPrompt = `${selectedModule?.systemPromptRead || ""}\n\n${ENGAGEMENT_GUIDANCE}`;
-          console.log("[Phase 1] Generated system prompt length:", systemPrompt.length);
+          console.log(
+            "[Phase 1] Generated system prompt length:",
+            systemPrompt.length,
+          );
           break;
         case 2:
           systemPrompt = `${selectedModule?.systemPromptExperiment || ""}\n_______________\nFor reference, they just read this text:\n${selectedModule ? selectedModule.text.join("\n") : ""}\n_______________\nAs you talk to them, follow this guidance:\n${ENGAGEMENT_GUIDANCE}`;
@@ -316,9 +313,13 @@ Any other groups you can think of
   };
 
   if (!selectedModule) {
-    return <ModuleSelection onModuleSelect={(moduleId) => {
-      setSelectedModule(moduleId);
-    }} />;
+    return (
+      <ModuleSelection
+        onModuleSelect={(moduleId) => {
+          setSelectedModule(moduleId);
+        }}
+      />
+    );
   }
 
   return (
@@ -328,7 +329,7 @@ Any other groups you can think of
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <h1 className="text-2xl font-bold text-primary">
-              Algorithmic Bias Learning Platform
+              LTD Reading Platform
             </h1>
 
             <div className="flex items-center space-x-6">
@@ -382,7 +383,11 @@ Any other groups you can think of
             isEngaged={paragraphEngagement[currentParagraph] || false}
             messageCount={paragraphMessageCounts[currentParagraph] || 0}
             onFloatingActionClick={handleFloatingActionClick}
-            isLastParagraph={selectedModule ? currentParagraph === selectedModule.text.length : false}
+            isLastParagraph={
+              selectedModule
+                ? currentParagraph === selectedModule.text.length
+                : false
+            }
             onFinish={() => {
               setShowingSurvey(true);
             }}
@@ -399,12 +404,21 @@ Any other groups you can think of
               />
             )}
             {(currentPhase === 2 || (currentPhase === 3 && !showingSurvey)) && (
-              <div data-selected-module data-experiment-html={selectedModule?.experimentHtml || ''}>
-                {console.log("[AlgorithmicBiasApp] selectedModule:", selectedModule)}
-                {console.log("[AlgorithmicBiasApp] experimentHtml being passed:", selectedModule?.experimentHtml || '')}
-                <BiasTestingTool 
+              <div
+                data-selected-module
+                data-experiment-html={selectedModule?.experimentHtml || ""}
+              >
+                {console.log(
+                  "[AlgorithmicBiasApp] selectedModule:",
+                  selectedModule,
+                )}
+                {console.log(
+                  "[AlgorithmicBiasApp] experimentHtml being passed:",
+                  selectedModule?.experimentHtml || "",
+                )}
+                <BiasTestingTool
                   onSendMessage={handleSendMessage}
-                  experimentHtml={selectedModule?.experimentHtml || ''}
+                  experimentHtml={selectedModule?.experimentHtml || ""}
                   key="bias-tool" // Prevent remounting
                 />
               </div>
@@ -418,9 +432,10 @@ Any other groups you can think of
                       onShowSurvey={() => {
                         const message = {
                           role: "assistant",
-                          content: "Thank you for saving your conclusion. You can continue working on it, or click the button below to finish and take an optional feedback survey.",
+                          content:
+                            "Thank you for saving your conclusion. You can continue working on it, or click the button below to finish and take an optional feedback survey.",
                         };
-                        setMessages(prev => [...prev, message]);
+                        setMessages((prev) => [...prev, message]);
                         scrollToBottom();
                       }}
                     />
@@ -439,7 +454,7 @@ Any other groups you can think of
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             <p className="text-sm text-gray-500">
-              © {new Date().getFullYear()} Algorithmic Bias Learning Platform
+              © {new Date().getFullYear()} LTD Reading Platform
             </p>
             <div>
               <button className="text-primary hover:text-blue-600 flex items-center text-sm">
