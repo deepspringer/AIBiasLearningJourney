@@ -9,6 +9,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
+import { initUserActivity } from "@/lib/userActivity";
 
 const loginSchema = z.object({
   displayName: z.string().min(2, {
@@ -52,6 +53,9 @@ export default function LoginPage() {
 
       localStorage.setItem("userId", result.id.toString());
       localStorage.setItem("displayName", data.displayName);
+      
+      // initialize user activity
+      initUserActivity(result.id.toString(), data.displayName)
 
       toast({
         title: "Welcome!",
