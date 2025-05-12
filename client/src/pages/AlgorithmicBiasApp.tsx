@@ -6,6 +6,7 @@ import PhaseNavigation from "@/components/ui/phase-navigation";
 import ChatPanel from "@/components/ui/chat-panel";
 import PhaseContent from "@/components/ui/phase-content";
 import TextReader from "@/components/phase1/text-reader";
+import SectionReader from "@/components/phase1/section-reader";
 import BiasTestingTool from "@/components/phase2/bias-testing-tool";
 import ConclusionWriter from "@/components/phase3/conclusion-writer";
 import Survey from "@/components/phase3/survey";
@@ -46,7 +47,8 @@ To start, read this first paragraph and tell me what you think.`,
   ]);
   const [phase2Messages, setPhase2Messages] = useState<Message[]>([]);
   const [currentParagraph, setCurrentParagraph] = useState(1);
-  const [paragraphMessageCounts, setParagraphMessageCounts] = useState<
+  // Track message counts by section rather than by paragraph
+  const [sectionMessageCounts, setSectionMessageCounts] = useState<
     Record<number, number>
   >({});
   const [paragraphEngagement, setParagraphEngagement] = useState<
@@ -160,10 +162,28 @@ To start, read this first paragraph and tell me what you think.`,
           );
           break;
         case 2:
-          systemPrompt = `${selectedModule?.systemPromptExperiment || ""}\n_______________\nFor reference, they just read this text:\n${selectedModule ? selectedModule.text.join("\n") : ""}\n_______________\nAs you talk to them, follow this guidance:\n${ENGAGEMENT_GUIDANCE}`;
+          // Format text content for the AI system prompt, handling different content types
+          const formattedContent = selectedModule?.text?.map(item => {
+            if (typeof item === 'string') return item;
+            if (item.type === 'text') return item.content;
+            if (item.type === 'image') return '[Image content]';
+            if (item.type === 'html') return '[Interactive HTML content]';
+            return `[Unknown content type: ${item.type}]`;
+          }).join("\n") || "";
+
+          systemPrompt = `${selectedModule?.systemPromptExperiment || ""}\n_______________\nFor reference, they just read this text:\n${formattedContent}\n_______________\nAs you talk to them, follow this guidance:\n${ENGAGEMENT_GUIDANCE}`;
           break;
         case 3:
-          systemPrompt = `${selectedModule?.systemPromptConclude || ""}\n_______________\nFor reference, they just read this text:\n${selectedModule ? selectedModule.text.join("\n") : ""}\n_______________\nAs you talk to them, follow this guidance:\n${ENGAGEMENT_GUIDANCE}`;
+          // Format text content for the AI system prompt, handling different content types
+          const conclusionFormattedContent = selectedModule?.text?.map(item => {
+            if (typeof item === 'string') return item;
+            if (item.type === 'text') return item.content;
+            if (item.type === 'image') return '[Image content]';
+            if (item.type === 'html') return '[Interactive HTML content]';
+            return `[Unknown content type: ${item.type}]`;
+          }).join("\n") || "";
+
+          systemPrompt = `${selectedModule?.systemPromptConclude || ""}\n_______________\nFor reference, they just read this text:\n${conclusionFormattedContent}\n_______________\nAs you talk to them, follow this guidance:\n${ENGAGEMENT_GUIDANCE}`;
           break;
       }
 
@@ -198,10 +218,17 @@ To start, read this first paragraph and tell me what you think.`,
           return newMessages;
         });
       }
-      const newCount = (paragraphMessageCounts[currentParagraph] || 0) + 1;
-      setParagraphMessageCounts((prevCounts) => ({
+      // Get the current section for this paragraph
+      const sectionIndexes = Array.isArray(selectedModule?.sectionIndexes) ?
+        selectedModule?.sectionIndexes : [0];
+
+      const { sectionIndex } = getSectionForParagraph(currentParagraph, sectionIndexes);
+
+      // Increment message count for the section instead of the paragraph
+      const newCount = (sectionMessageCounts[sectionIndex] || 0) + 1;
+      setSectionMessageCounts((prevCounts) => ({
         ...prevCounts,
-        [currentParagraph]: newCount,
+        [sectionIndex]: newCount,
       }));
 
       // Check engagement if we've reached the threshold
@@ -215,7 +242,7 @@ To start, read this first paragraph and tell me what you think.`,
           if (m.role === "system") return false;
           if (
             m.role === "assistant" &&
-            m.content.includes(`Let's discuss paragraph`)
+            (m.content.includes(`Let's discuss paragraph`) || m.content.includes(`Let's discuss section`))
           )
             return false;
           // Count messages after the last paragraph change message
@@ -284,20 +311,90 @@ To start, read this first paragraph and tell me what you think.`,
     }
   };
 
+  // Determine which section a paragraph belongs to
+  const getSectionForParagraph = (paragraph: number, sectionIndexes: number[] = [0]) => {
+    console.log("SECTION LOOKUP - Finding section for paragraph:", paragraph);
+    console.log("SECTION LOOKUP - Using section indexes:", sectionIndexes);
+
+    if (!Array.isArray(sectionIndexes) || sectionIndexes.length === 0) {
+      console.log("SECTION LOOKUP - No valid section indexes, defaulting to single section");
+      return {
+        sectionIndex: 0,
+        sectionStart: 0,
+        sectionEnd: selectedModule?.text?.length || 0
+      };
+    }
+
+    // Find which section this paragraph belongs to
+    for (let i = sectionIndexes.length - 1; i >= 0; i--) {
+      const sectionStart = sectionIndexes[i];
+      const sectionEnd = sectionIndexes[i + 1] || (selectedModule?.text?.length || 0);
+
+      console.log(`SECTION LOOKUP - Checking section ${i}: Range [${sectionStart} - ${sectionEnd})`);
+
+      if (paragraph >= sectionStart) {
+        console.log(`SECTION LOOKUP - Found section ${i} for paragraph ${paragraph}: Range [${sectionStart} - ${sectionEnd})`);
+        return {
+          sectionIndex: i,
+          sectionStart: sectionStart,
+          sectionEnd: sectionEnd
+        };
+      }
+    }
+
+    console.log("SECTION LOOKUP - No matching section found, defaulting to section 0");
+    return {
+      sectionIndex: 0,
+      sectionStart: 0,
+      sectionEnd: sectionIndexes[1] || (selectedModule?.text?.length || 0)
+    };
+  };
+
   const handleParagraphChange = (newParagraph: number) => {
+    console.log("PARAGRAPH CHANGE - Changing from paragraph", currentParagraph, "to", newParagraph);
+
+    // Get current section before the change
+    const currentSectionIndexes = Array.isArray(selectedModule?.sectionIndexes) ?
+      selectedModule?.sectionIndexes : [0];
+    const { sectionIndex: currentSectionIndex } = getSectionForParagraph(currentParagraph, currentSectionIndexes);
+
+    // Update the current paragraph
     setCurrentParagraph(newParagraph);
-    // Add a message about the new paragraph
+
+    // Get new section information
+    const sectionIndexes = Array.isArray(selectedModule?.sectionIndexes) ?
+      selectedModule?.sectionIndexes : [0];
+    const { sectionIndex, sectionStart, sectionEnd } = getSectionForParagraph(newParagraph, sectionIndexes);
+
+    console.log("PARAGRAPH CHANGE - Section change:", {
+      previousParagraph: currentParagraph,
+      newParagraph,
+      previousSectionIndex: currentSectionIndex,
+      newSectionIndex: sectionIndex,
+      sectionStartParagraph: sectionStart,
+      sectionEndParagraph: sectionEnd,
+      relativeParagraphPosition: newParagraph - sectionStart,
+      totalParagraphsInSection: sectionEnd - sectionStart
+    });
+
+    // Add a message about the new section
     setMessages((prev) => [
       ...prev,
       {
         role: "assistant",
-        content: `Here is section ${newParagraph}.   Read it and let me know what your thoughts and questions are.`,
+        content: `Let's discuss section ${sectionIndex + 1} of the content. Read it carefully and let me know what your thoughts and questions are.`,
       },
     ]);
-    setParagraphMessageCounts((prevCounts) => ({
-      ...prevCounts,
-      [newParagraph]: 0, //Reset count for new paragraph
-    }));
+
+    // Reset message count for the section, not just the paragraph
+    setSectionMessageCounts((prevCounts) => {
+      const newCounts = {
+        ...prevCounts,
+        [sectionIndex]: 0, // Reset count for new section
+      };
+      console.log("PARAGRAPH CHANGE - Reset section message counts:", newCounts);
+      return newCounts;
+    });
   };
 
   const handleFloatingActionClick = () => {
@@ -305,7 +402,21 @@ To start, read this first paragraph and tell me what you think.`,
       if (selectedModule && currentParagraph === selectedModule.text.length) {
         setCurrentPhase(2);
       } else {
-        handleParagraphChange(currentParagraph + 1);
+        // Get current section index
+        const sectionIndexes = Array.isArray(selectedModule?.sectionIndexes) ?
+          selectedModule?.sectionIndexes : [0];
+        const { sectionIndex: currentSectionIndex } = getSectionForParagraph(currentParagraph, sectionIndexes);
+
+        // Determine next section start paragraph (using 1-indexed paragraphs)
+        const nextSectionIndex = currentSectionIndex + 1;
+        if (nextSectionIndex < sectionIndexes.length) {
+          const nextSectionStart = sectionIndexes[nextSectionIndex] + 1; // +1 to convert to 1-indexed paragraph
+          console.log(`FLOATING ACTION - Moving from section ${currentSectionIndex} to section ${nextSectionIndex}, paragraph ${nextSectionStart}`);
+          handleParagraphChange(nextSectionStart);
+        } else if (currentParagraph < (selectedModule?.text?.length || 0)) {
+          // If no more sections, go to the last paragraph
+          setCurrentPhase(2); // Move to the next phase if we're at the end of sections
+        }
       }
     } else if (currentPhase === 2 && phase2Messages.length >= 10) {
       setCurrentPhase(3);
@@ -381,7 +492,18 @@ To start, read this first paragraph and tell me what you think.`,
             isLoading={isMessageLoading}
             currentPhase={currentPhase}
             isEngaged={paragraphEngagement[currentParagraph] || false}
-            messageCount={paragraphMessageCounts[currentParagraph] || 0}
+            messageCount={
+              (() => {
+                // Calculate section index for current paragraph
+                if (!selectedModule) return 0;
+
+                const sectionIndexes = Array.isArray(selectedModule.sectionIndexes) ?
+                  selectedModule.sectionIndexes : [0];
+                const { sectionIndex } = getSectionForParagraph(currentParagraph, sectionIndexes);
+
+                return sectionMessageCounts[sectionIndex] || 0;
+              })()
+            }
             onFloatingActionClick={handleFloatingActionClick}
             isLastParagraph={
               selectedModule
@@ -396,11 +518,13 @@ To start, read this first paragraph and tell me what you think.`,
           {/* Content Panel */}
           <PhaseContent currentPhase={currentPhase}>
             {currentPhase === 1 && selectedModule && (
-              <TextReader
+              <SectionReader
                 currentParagraph={currentParagraph}
                 onParagraphChange={handleParagraphChange}
-                paragraphMessageCounts={paragraphMessageCounts}
+                paragraphMessageCounts={{}} // Keep for backward compatibility
+                sectionMessageCounts={sectionMessageCounts}
                 moduleText={selectedModule.text}
+                sectionIndexes={Array.isArray(selectedModule.sectionIndexes) ? selectedModule.sectionIndexes : [0]}
               />
             )}
             {(currentPhase === 2 || (currentPhase === 3 && !showingSurvey)) && (
