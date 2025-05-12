@@ -10,12 +10,22 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
+import { ContentItem } from "@/components/ui/content-item";
+import { SectionManager } from "@/components/ui/section-manager";
 import { useToast } from "@/hooks/use-toast";
+import { ContentItem as ContentItemType } from "@shared/schema";
+
+const contentItemSchema = z.object({
+  type: z.enum(["text", "image", "html", "conclusion"]),
+  content: z.string().min(1, "Content is required"),
+  instructions: z.string().optional(),
+});
 
 const moduleSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
   description: z.string().min(10, "Description must be at least 10 characters"),
-  text: z.array(z.string()).min(1, "At least one text paragraph is required"),
+  text: z.array(contentItemSchema).min(1, "At least one content item is required"),
+  section_indexes: z.array(z.number()).default([0]),
   system_prompt_read: z.string().min(10, "Reading prompt must be at least 10 characters"),
   experiment_html: z.string().min(10, "Experiment HTML must be at least 10 characters"),
   system_prompt_experiment: z.string().min(10, "Experiment prompt must be at least 10 characters"),
@@ -29,14 +39,18 @@ export default function AddModulePage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [, setLocation] = useLocation();
   const { toast } = useToast();
-  const [paragraphCount, setParagraphCount] = useState(1);
+  const [contentItems, setContentItems] = useState<ContentItemType[]>([
+    { type: "text", content: "" }
+  ]);
+  const [sectionIndexes, setSectionIndexes] = useState<number[]>([0]);
 
   const form = useForm<ModuleFormValues>({
     resolver: zodResolver(moduleSchema),
     defaultValues: {
       name: "",
       description: "",
-      text: [""],
+      text: [{ type: "text", content: "" }],
+      section_indexes: [0],
       system_prompt_read: "",
       experiment_html: "",
       system_prompt_experiment: "",
@@ -125,30 +139,114 @@ export default function AddModulePage() {
               />
 
               <div className="space-y-4">
-                <FormLabel>Module Text Paragraphs</FormLabel>
-                {Array.from({ length: paragraphCount }).map((_, index) => (
+                <div className="flex justify-between items-center">
+                  <FormLabel>Module Content</FormLabel>
+                  <div className="space-x-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newItems = [...contentItems, { type: "text", content: "" }];
+                        setContentItems(newItems);
+                        form.setValue("text", newItems);
+                      }}
+                    >
+                      Add Text
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newItems = [...contentItems, { type: "image", content: "" }];
+                        setContentItems(newItems);
+                        form.setValue("text", newItems);
+                      }}
+                    >
+                      Add Image
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newItems = [...contentItems, { type: "html", content: "" }];
+                        setContentItems(newItems);
+                        form.setValue("text", newItems);
+                      }}
+                    >
+                      Add HTML
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        const newItems = [...contentItems, {
+                          type: "conclusion",
+                          content: "",
+                          instructions: "Write your conclusion based on what you've learned."
+                        }];
+                        setContentItems(newItems);
+                        form.setValue("text", newItems);
+                      }}
+                    >
+                      Add Conclusion
+                    </Button>
+                  </div>
+                </div>
+
+                {contentItems.map((item, index) => (
                   <FormField
                     key={index}
                     control={form.control}
                     name={`text.${index}`}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>Paragraph {index + 1}</FormLabel>
                         <FormControl>
-                          <Textarea {...field} />
+                          <ContentItem
+                            index={index}
+                            value={field.value}
+                            onChange={(value) => {
+                              field.onChange(value);
+                              const newItems = [...contentItems];
+                              newItems[index] = value;
+                              setContentItems(newItems);
+                            }}
+                            onRemove={() => {
+                              if (contentItems.length <= 1) {
+                                toast({
+                                  title: "Cannot remove",
+                                  description: "You need at least one content item",
+                                  variant: "destructive",
+                                });
+                                return;
+                              }
+
+                              const newItems = contentItems.filter((_, i) => i !== index);
+                              setContentItems(newItems);
+                              form.setValue("text", newItems);
+                            }}
+                          />
                         </FormControl>
                         <FormMessage />
                       </FormItem>
                     )}
                   />
                 ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => setParagraphCount(prev => prev + 1)}
-                >
-                  Add Paragraph
-                </Button>
+
+                <div className="mt-8">
+                  <h3 className="text-base font-medium mb-2">Section Management</h3>
+                  <SectionManager
+                    contentCount={contentItems.length}
+                    sectionIndexes={sectionIndexes}
+                    onChange={(indexes) => {
+                      setSectionIndexes(indexes);
+                      form.setValue("section_indexes", indexes);
+                    }}
+                  />
+                </div>
               </div>
 
               <FormField

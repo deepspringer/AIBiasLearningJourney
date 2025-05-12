@@ -96,11 +96,20 @@ export const insertEngagementScoreSchema = createInsertSchema(engagementScores).
 export type InsertEngagementScore = z.infer<typeof insertEngagementScoreSchema>;
 export type EngagementScore = typeof engagementScores.$inferSelect;
 
+// Define content item types for modules
+export type ContentItem = {
+  type: "text" | "image" | "html" | "conclusion";
+  content: string; // Text content, image URL, HTML content, or conclusion instructions
+  // Optional additional fields for conclusion type
+  instructions?: string;
+};
+
 export const modules = pgTable("modules", {
   id: serial("id").primaryKey(),
   name: text("name").notNull(),
   description: text("description").notNull(),
-  text: json("text").$type<string[]>().notNull(),
+  text: json("text").$type<ContentItem[]>().notNull(),
+  sectionIndexes: json("section_indexes").$type<number[]>().default([0]),
   systemPromptRead: text("system_prompt_read").notNull(),
   experimentHtml: text("experiment_html").notNull(),
   systemPromptExperiment: text("system_prompt_experiment").notNull(),

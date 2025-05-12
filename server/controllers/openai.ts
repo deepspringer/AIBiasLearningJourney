@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import OpenAI from "openai";
 import { storage } from "../storage";
+import fs from "fs";
 
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY || "",
@@ -50,11 +51,50 @@ export async function handleChat(req: Request, res: Response) {
       const module = await storage.getModule(moduleId);
       if (module && module.text) {
         console.log("[Phase 1] Retrieved module text, length:", module.text.length);
-        const fullText = module.text.join("\n\n");
-        const currentParagraph = module.text[paragraph - 1];
-        console.log("[Phase 1] Current paragraph length:", currentParagraph.length);
+        console.log("[Phase 1] Module section indexes:", module.sectionIndexes);
 
-        finalSystemPrompt = `You are helping to guide a student through the following text paragraph by paragraph: ${fullText}. ${systemPrompt} This is the paragraph you are discussing: ${currentParagraph}`;
+        // Format the full text
+        const fullText = Array.isArray(module.text) ?
+          module.text.map(item => {
+            if (typeof item === 'string') return item;
+            if (item.type === 'text') return item.content;
+            if (item.type === 'image') return '[Image content]';
+            if (item.type === 'html') return '[Interactive HTML content]';
+            return `[Unknown content type: ${item.type}]`;
+          }).join("\n\n") : '';
+
+        // Determine which section the current paragraph belongs to
+        const sectionIndexes = Array.isArray(module.sectionIndexes) ? module.sectionIndexes : [0];
+        console.log("[Phase 1] Section indexes:", sectionIndexes);
+
+        // Find the section that contains the current paragraph
+        let sectionStartIndex = 0;
+        let sectionEndIndex = module.text.length;
+
+        for (let i = 0; i < sectionIndexes.length; i++) {
+          if (paragraph >= sectionIndexes[i]) {
+            sectionStartIndex = sectionIndexes[i];
+            sectionEndIndex = sectionIndexes[i + 1] || module.text.length;
+            if (paragraph < sectionEndIndex) break;
+          }
+        }
+
+        console.log(`[Phase 1] Current paragraph ${paragraph} is in section from index ${sectionStartIndex} to ${sectionEndIndex}`);
+
+        // Extract the current section text
+        const sectionContent = module.text.slice(sectionStartIndex, sectionEndIndex);
+        const sectionText = sectionContent.map(item => {
+          if (typeof item === 'string') return item;
+          if (item.type === 'text') return item.content;
+          if (item.type === 'image') return '[Image content]';
+          if (item.type === 'html') return '[Interactive HTML content]';
+          return `[Unknown content type: ${item.type}]`;
+        }).join("\n\n");
+
+        console.log("[Phase 1] Current section length:", sectionText.length);
+
+        // Create the system prompt with the entire section context
+        finalSystemPrompt = `You are helping to guide a student through the following text, section by section: ${fullText}. ${systemPrompt} This is the section you are discussing now:\n\n${sectionText}`;
         console.log("[Phase 1] Generated final system prompt, length:", finalSystemPrompt.length);
       }
     }
@@ -234,5 +274,69 @@ export async function handleSaveConclusion(req: Request, res: Response) {
   } catch (error) {
     console.error("Error in save conclusion endpoint:", error);
     res.status(500).json({ error: "Failed to save conclusion" });
+  }
+}
+
+interface TranscribeRequestBody {
+  audio: string; // Base64 encoded audio
+  userId?: string | null;
+}
+
+export async function handleTranscribe(req: Request, res: Response) {
+  try {
+    const { audio, userId: requestUserId } = req.body as TranscribeRequestBody;
+
+    if (!audio) {
+      return res.status(400).json({ error: "No audio data provided" });
+    }
+
+    // Convert base64 to Buffer
+    const audioBuffer = Buffer.from(audio, 'base64');
+
+    // Log the size of the audio
+    console.log(`[Server] Received audio size: ${(audioBuffer.length / 1024 / 1024).toFixed(2)}MB`);
+
+    // Create a temporary file with the audio data
+    const tempFilePath = `/tmp/audio-${Date.now()}.webm`;
+    fs.writeFileSync(tempFilePath, audioBuffer);
+
+    // Send to OpenAI's Whisper API
+    const transcription = await openai.audio.transcriptions.create({
+      file: fs.createReadStream(tempFilePath),
+      model: "whisper-1",
+      language: "en",
+      // Force whisper to use a lower quality but smaller model
+      response_format: "text",
+    });
+
+    // Clean up the temporary file
+    fs.unlinkSync(tempFilePath);
+
+    // Log success (without the full audio data) and handle different response formats
+    console.log("[Server] Audio transcription successful:", {
+      transcription,
+      audio_size_kb: Math.round(audioBuffer.length / 1024)
+    });
+
+    // When response_format is "text", the API returns a string directly
+    // instead of an object with a text property
+    const transcriptionText = typeof transcription === 'string'
+      ? transcription
+      : transcription.text || "";
+
+    // Return the transcription with a consistent format
+    res.json({ text: transcriptionText });
+
+  } catch (error: any) {
+    console.error("Error in transcribe endpoint:", error);
+
+    // Provide more detailed error info for debugging
+    const errorMessage = error.message || "Unknown error";
+    const errorStatus = error.status || 500;
+
+    res.status(errorStatus).json({
+      error: "Failed to transcribe audio",
+      details: errorMessage
+    });
   }
 }
