@@ -62,6 +62,16 @@ To start, read this first paragraph and tell me what you think.`,
         if (storedDisplayName && storedUserId) {
             setDisplayName(storedDisplayName);
             setUserId(storedUserId);
+
+            // Load user activity
+            const activity = getUserActivity();
+            if (activity) {
+                setCurrentPhase(activity.currentPhase as Phase);
+                setCurrentParagraph(activity.currentParagraph || 1);
+                setParagraphEngagement(activity.paragraphEngagement || {});
+                setParagraphMessageCounts(activity.paragraphMessageCounts || {});
+                setMessages(activity.messages || []);
+            }
         }
     }, []);
 
@@ -108,9 +118,12 @@ Any other groups you can think of
             updateUserActivity({
                 currentPhase,
                 currentParagraph: currentPhase === 1 ? currentParagraph : undefined,
+                paragraphEngagement,
+                paragraphMessageCounts,
+                messages,
             });
         }
-    }, [currentPhase, currentParagraph, userId, displayName]);
+    }, [currentPhase, currentParagraph, userId, displayName, paragraphEngagement, paragraphMessageCounts, messages]);
 
     const handleSendMessage = async (message: string) => {
         if (!message.trim()) return;

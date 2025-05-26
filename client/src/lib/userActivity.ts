@@ -3,6 +3,8 @@ type UserActivity = {
     displayName: string;
     currentPhase: number;
     currentParagraph?: number;
+    paragraphEngagement: Record<number, boolean>;
+    paragraphMessageCounts: Record<number, number>;
     messages: {
         role: "user" | "assistant";
         content: string;
@@ -16,6 +18,8 @@ export const initUserActivity = (userId: string, displayName: string) => {
         userId,
         displayName,
         currentPhase: 1,
+        paragraphEngagement: {},
+        paragraphMessageCounts: {},
         messages: [],
         lastActive: new Date().toISOString(),
     };
